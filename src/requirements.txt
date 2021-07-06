@@ -1,0 +1,5 @@
+lxml
+kafka
+pymongo
+ruamel.yaml
+requests
