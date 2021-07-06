@@ -1,5 +1,5 @@
 import logging
-
+import time
 #from kafka import KafkaConsumer, KafkaProducer
 
 
@@ -24,9 +24,10 @@ import logging
 
 class EventStreamBase(object):
 
-    event_string: str = "events"
-    state_separator: str = "_"
-    relation_type_separator: str = "-"
+    id = time.time()
+    event_string = "events"
+    state_separator = "_"
+    relation_type_separator = "-"
 
     bootstrap_servers = ['kafka:9092']
     group_id = 'worker'
@@ -38,20 +39,26 @@ class EventStreamBase(object):
 
     config_states = {
         'raw': {
-            'own_topic': ['discussed', 'crossref']
+            'own_topic': ['discusses', 'crossref']
         },
         'linked': {
-            'own_topic': ['discussed']
+            'own_topic': ['discusses']
         },
         'unknown': {
         },
         'processed': {
-            'own_topic': ['discussed']
+            'own_topic': ['discusses']
         },
         'aggregated': {
         }}
 
     topics = []
+
+    log = "EventStreamBase " + str(id) + " "
+
+    def __init__(self, id_in):
+        self.id = id_in
+        self.log = self.log + str(self.id) + ": "
 
     def build_topic_list(self):
         result = []
@@ -65,7 +72,7 @@ class EventStreamBase(object):
                     result.append(self.build_topic_name(c_state, c_o_topic))
 
         self.topics = result
-        logging.warning("current topics for events: %s" % self.topics)
+        logging.warning("%s current topics for events: %s" % (self.log, self.topics))
         return result
 
     def build_topic_name(self, state, relation_type=''):
@@ -75,19 +82,41 @@ class EventStreamBase(object):
             result = result + self.relation_type_separator + relation_type
         return result
 
+
+    def get_topic_name_event(self, event):
+        state = event.get('state')
+        relation_type = event.get('relation_type')
+        result = self.event_string + self.state_separator + state
+
+        # if a relation type is set and has is own topic
+        logging.warning('rt %s, c %s' %(relation_type, self.config_states[state]['own_topic']))
+        if relation_type != '' and relation_type in self.config_states[state]['own_topic']:
+            result = result + self.relation_type_separator + relation_type
+        return result
+
+
+    def get_topic_name(self, state, relation_type=''):
+        result = self.event_string + self.state_separator + state
+
+        # if a relation type is set and has is own topic
+        if relation_type != '' and relation_type in self.config_states[state]['own_topic']:
+            result = result + self.relation_type_separator + relation_type
+        return result
+
+    # todo
     # def load_config(self):
     #     #data = yaml.safe_load(open('defaults.yaml'))
     #     #data['url']
 
-    def resolveEvent(self, event):
+    def resolve_event(self, event):
         topic_name = self.build_topic_name(event['state'], event['relation_type'])
         if topic_name in self.topics:
             return topic_name
 
-        logging.warning("Unable to resolve event, topic_name %s not found" % topic_name)
+        logging.warning(self.log + "Unable to resolve event, topic_name %s not found" % topic_name)
         return False
 
 
 if __name__ == '__main__':
-    e = EventStreamBase()
+    e = EventStreamBase(1)
     print(e.build_topic_list())
