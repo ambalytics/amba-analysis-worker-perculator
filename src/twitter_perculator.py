@@ -4,9 +4,9 @@ import doi_resolver
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
-from EventStream.event_stream_consumer import EventStreamConsumer
-from EventStream.event_stream_producer import EventStreamProducer
-from EventStream.event import Event
+from event_stream.event_stream_consumer import EventStreamConsumer
+from event_stream.event_stream_producer import EventStreamProducer
+from event_stream.event import Event
 
 
 def url_doi_check(data):
