@@ -52,7 +52,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             doi = url_doi_check(e.data['subj']['data'])
             # logging.warning('doi 1 ' + str(doi))
             if doi is not False:
-                e.data['obj']['data']['doi'] = doi
+                e.data['obj']['data']['doi'] = doi  # todo why are full links in doi
+                e.data['doiTemp'] = doi  # todo why are full links in doi
                 publication = self.get_publication_info(doi)
                 if publication is not False:
                     self.add_publication(e, publication)
@@ -70,6 +71,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                         # use first doi we get
                         # logging.warning(self.log + e.data['subj']['data']['_id'] + " doi includes")
                         e.data['obj']['data']['doi'] = doi  # todo why are full links in doi
+                        e.data['doiTemp'] = doi  # todo why are full links in doi
                         publication = self.get_publication_info(doi)
                         if publication is not False:
                             self.add_publication(e, publication)
