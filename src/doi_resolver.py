@@ -138,7 +138,7 @@ def url_doi_check(data):
     return doi_data
 
 
-@lru_cache(maxsize=100)
+@lru_cache(maxsize=5000)
 def link_url(url):
     print(url)
 

@@ -103,7 +103,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         self.db = self.mongo_client[self.config['mongo_client']]
         self.collection = self.db[self.config['mongo_collection']]
 
-    @lru_cache(maxsize=100)
+    @lru_cache(maxsize=1000)
     def get_publication_info(self, doi):
         publication = self.get_publication_from_mongo(doi)
         if publication:
