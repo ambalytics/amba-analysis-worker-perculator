@@ -51,11 +51,14 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                 e.data['obj']['data']['doi'] = doi
                 # e.data['doiTemp'] = doi
                 publication = self.get_publication_info(doi)
-                if publication is not False:
-                    self.add_publication(e, publication)
+                self.add_publication(e, publication)
+
+                if 'title' in publication:
+                    e.set('state', 'linked')
                     logging.warning('publish linked message of doi ')
                 else:
                     e.set('state', 'unknown')
+
                 self.publish(e)
                 # check the includes object for the original tweet url
             elif 'tweets' in e.data['subj']['data']['includes']:
@@ -69,11 +72,14 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                         e.data['obj']['data']['doi'] = doi
                         # e.data['doiTemp'] = doi
                         publication = self.get_publication_info(doi)
-                        if publication is not False:
-                            self.add_publication(e, publication)
+                        self.add_publication(e, publication)
+
+                        if 'title' in publication:
+                            e.set('state', 'linked')
                             logging.warning('publish linked message of doi in includes')
                         else:
                             e.set('state', 'unknown')
+
                         self.publish(e)
                         # publish_message(producer, parsed_topic_name, 'parsed',
                         #                 json.dumps(json_msg['data'], indent=2).encode('utf-8'))
@@ -87,8 +93,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         event.data['obj']['data'] = publication
         doi_base_url = "https://doi.org/"  # todo
         event.data['obj']['pid'] = doi_base_url + publication['doi']
+        event.data['obj']['alternative-id'] = publication['doi']
         event.set('obj_id', event.data['obj']['pid'])
-        event.set('state', 'linked')
 
     def prepare_amba_connection(self):
         transport = AIOHTTPTransport(url=self.config['url'])
@@ -96,10 +102,10 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     def prepare_mongo_connection(self):
         self.mongo_client = pymongo.MongoClient(host=self.config['mongo_url'],
-                                                serverSelectionTimeoutMS=3000,  # 3 second timeout
-                                                username="root",
-                                                password="example"
-                                                )
+                                               serverSelectionTimeoutMS=3000,  # 3 second timeout
+                                               username="root",
+                                               password="example"
+                                               )
         self.db = self.mongo_client[self.config['mongo_client']]
         self.collection = self.db[self.config['mongo_collection']]
 
@@ -116,7 +122,9 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             self.save_publication_to_mongo(publication)
             return publication
 
-        return None
+        return {
+            'doi': doi
+        }
 
     def get_publication_from_mongo(self, doi):
         if not self.mongo_client:
@@ -129,7 +137,10 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     def save_publication_to_mongo(self, publication):
         logging.debug('save publication to mongo')
         try:
-            publication['_id'] = publication['id']
+            # publication['_id'] = publication['id']
+            publication['_id'] = publication['doi']
+            publication['source'] = 'amba'
+            publication['source-a'] = 'perculator' # todo remove
             self.collection.insert_one(publication)
         except pymongo.errors.DuplicateKeyError:
             logging.warning("MongoDB publication, Duplicate found, continue" % publication)

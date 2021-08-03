@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 import requests
 import time
@@ -32,11 +33,11 @@ def crossref_url_search(url):
         json_response = r.json()
         if 'status' in json_response:
             if json_response['status'] == 'ok':
-                # print(json_response)
+                # logging.debug(json_response)
                 if 'message' in json_response:
                     if 'events' in json_response['message']:
                         for event in json_response['message']['events']:
-                            return event['obj_id']
+                            return event['obj_id'][16:] # https://doi.org/ -> 16
     return False
 
 
@@ -54,8 +55,8 @@ def get_potential_dois_from_text(text):
 
     if doi_re.search(text) is not None:
         temp_doi = doi_re.search(text).group()
-        # print(doi_re.findall(ur))
-        # print(temp_doi)
+        # logging.debug(doi_re.findall(ur))
+        # logging.debug(temp_doi)
         result.add(temp_doi)
         result.add(get_dois_regex(last_slash, temp_doi))
         result.add(get_dois_regex(first_slash, temp_doi))
@@ -70,8 +71,8 @@ def get_potential_dois_from_text(text):
 
 def get_dois_regex(regex, temp_doi):
     if regex.search(temp_doi) is not None:
-        # print(regex.search(temp_doi).group())
-        # print(regex.findall(temp_doi))
+        # logging.debug(regex.search(temp_doi).group())
+        # logging.debug(regex.findall(temp_doi))
         return regex.findall(temp_doi)[0]
 
 
@@ -102,9 +103,9 @@ def get_lxml(page):
     result = set([])
     for meta in content.xpath('//html//head//meta'):
         for name, value in sorted(meta.items()):
-            # print(name)
+            # logging.debug(name)
             if value.strip().lower() in ['citation_doi', 'dc.identifier', 'evt-doipage']:
-                # print(meta.get('content'))
+                # logging.debug(meta.get('content'))
                 result.add(meta.get('content'))
     return result
 
@@ -122,7 +123,7 @@ def get_filtered_dois_from_meta(potential_dois):
             r.add(t)
     return r
 
-
+# get first url in urls, prefer expanded_url
 def url_doi_check(data):
     doi_data = False
 
@@ -140,12 +141,12 @@ def url_doi_check(data):
 
 @lru_cache(maxsize=5000)
 def link_url(url):
-    print(url)
+    logging.debug(url)
 
     # url
     doi = check_doi_list_valid(get_potential_dois_from_text(url))
     if doi:
-        print('url')
+        logging.debug('url')
         return doi
 
     s = Session()
@@ -155,19 +156,19 @@ def link_url(url):
     pot_doi = get_lxml(r)
     doi = check_doi_list_valid(get_filtered_dois_from_meta(pot_doi))
     if doi and doi != set([]):
-        print('meta')
+        logging.debug('meta')
         return doi
 
     # crossref
     doi = crossref_url_search(url)
     if doi:
-        print('crossref')
+        logging.debug('crossref')
         return doi
 
     # fulltext
     doi = check_doi_list_valid(search_fulltext(r))
     if doi:
-        print('fulltext')
+        logging.debug('fulltext')
         return doi
 
     return False
@@ -214,11 +215,11 @@ if __name__ == '__main__':
     #     "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter",
     #     "https://www.jmcc-online.com/article/S0022-2828(21)00101-2/fulltext"
     # ]
-    print("start")
+    logging.debug("start")
     start = time.time()
     r = set([])
     for url in urls:
         r.add(link_url(url))
-        print(link_url(url))
-    # print(sorted(r))
-    print("total link: " + str(time.time() - start))
+        logging.debug(link_url(url))
+    # logging.debug(sorted(r))
+    logging.debug("total link: " + str(time.time() - start))
