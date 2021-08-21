@@ -6,7 +6,6 @@ import time
 from lxml import html
 from functools import lru_cache
 
-# todo real cache
 from requests import Session
 
 
@@ -139,7 +138,7 @@ def url_doi_check(data):
     return doi_data
 
 
-@lru_cache(maxsize=5000)
+@lru_cache(maxsize=500)
 def link_url(url):
     logging.debug(url)
 

@@ -11,6 +11,89 @@ from event_stream.event_stream_producer import EventStreamProducer
 from event_stream.event import Event
 
 
+@lru_cache(maxsize=100)
+def get_publication_from_mongo(collection, doi):
+    return collection.find_one({"doi": doi})
+
+@lru_cache(maxsize=100)
+def get_publication_from_amba(amba_client, doi):
+    query = gql(
+        """
+        query getPublication($doi: [String!]!) {
+         publicationsByDoi(doi: $doi) {
+          id,
+          type,
+          doi,
+          abstract,
+          pubDate,
+          publisher,
+          rank,
+          citationCount,
+          title,
+          normalizedTitle,
+          year,
+          citations {
+              id,
+              type,
+              doi,
+              abstract,
+              pubDate,
+              publisher,
+              rank,
+              citationCount,
+              title,
+              normalizedTitle,
+              year
+          },
+          refs  {
+              id,
+              type,
+              doi,
+              abstract,
+              pubDate,
+              publisher,
+              rank,
+              citationCount,
+              title,
+              normalizedTitle,
+              year
+          },
+          authors {
+              id,
+              name,
+              normalizedName,
+              pubCount,
+              citationCount,
+              rank
+          },
+          fieldsOfStudy {
+              score,
+              name,
+              normalizedName,
+              level,
+              rank,
+              citationCount
+          }
+        } 
+    }
+
+    """)
+
+    # todo  affiliation: Affiliation author
+    #   parents: [FieldOfStudy!]
+    #   children: [FieldOfStudy!]
+
+    params = {"doi": doi}
+    result = amba_client.execute(query, variable_values=params)
+    if 'publicationsByDoi' in result and len(result['publicationsByDoi']) > 0:
+        # todo better way?
+        publication = result['publicationsByDoi'][0]
+        return publication
+    else:
+        logging.warning('unable to get data for doi: %s' % doi)
+    return None
+
+
 class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     state = "unlinked"
     group_id = "perculator"
@@ -109,14 +192,18 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         self.db = self.mongo_client[self.config['mongo_client']]
         self.collection = self.db[self.config['mongo_collection']]
 
-    @lru_cache(maxsize=1000)
+
     def get_publication_info(self, doi):
-        publication = self.get_publication_from_mongo(doi)
+        if not self.mongo_client:
+            self.prepare_mongo_connection()
+        publication = get_publication_from_mongo(self.collection, doi)
         if publication:
             logging.debug('get publication from mongo')
             return publication
 
-        publication = self.get_publication_from_amba(doi)
+        if not self.amba_client:
+            self.prepare_amba_connection()
+        publication = get_publication_from_amba(self.amba_client, doi)
         if publication:
             logging.debug('get publication from amba')
             self.save_publication_to_mongo(publication)
@@ -126,10 +213,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             'doi': doi
         }
 
-    def get_publication_from_mongo(self, doi):
-        if not self.mongo_client:
-            self.prepare_mongo_connection()
-        return self.collection.find_one({"doi": doi})
 
     # save the publication to our mongo to
     # this allows faster access and to store calculated data right on it
@@ -144,83 +227,3 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             self.collection.insert_one(publication)
         except pymongo.errors.DuplicateKeyError:
             logging.warning("MongoDB publication, Duplicate found, continue" % publication)
-
-    def get_publication_from_amba(self, doi):
-        if not self.amba_client:
-            self.prepare_amba_connection()
-
-        query = gql(
-            """
-            query getPublication($doi: [String!]!) {
-             publicationsByDoi(doi: $doi) {
-              id,
-              type,
-              doi,
-              abstract,
-              pubDate,
-              publisher,
-              rank,
-              citationCount,
-              title,
-              normalizedTitle,
-              year,
-              citations {
-                  id,
-                  type,
-                  doi,
-                  abstract,
-                  pubDate,
-                  publisher,
-                  rank,
-                  citationCount,
-                  title,
-                  normalizedTitle,
-                  year
-              },
-              refs  {
-                  id,
-                  type,
-                  doi,
-                  abstract,
-                  pubDate,
-                  publisher,
-                  rank,
-                  citationCount,
-                  title,
-                  normalizedTitle,
-                  year
-              },
-              authors {
-                  id,
-                  name,
-                  normalizedName,
-                  pubCount,
-                  citationCount,
-                  rank
-              },
-              fieldsOfStudy {
-                  score,
-                  name,
-                  normalizedName,
-                  level,
-                  rank,
-                  citationCount
-              }
-            } 
-        }
-
-        """)
-
-        # todo  affiliation: Affiliation author
-        #   parents: [FieldOfStudy!]
-        #   children: [FieldOfStudy!]
-
-        params = {"doi": doi}
-        result = self.amba_client.execute(query, variable_values=params)
-        if 'publicationsByDoi' in result and len(result['publicationsByDoi']) > 0:
-            # todo better way?
-            publication = result['publicationsByDoi'][0]
-            return publication
-        else:
-            logging.warning(self.log + 'unable to get data for doi: %s' % doi)
-        return None
