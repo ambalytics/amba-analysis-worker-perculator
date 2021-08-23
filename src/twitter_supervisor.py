@@ -7,21 +7,28 @@ import logging
 
 
 class Supervisor:
+    """supervisor class
+    """
+
     def __init__(self):
+        """init"""
         self.running = True
         signal.signal(signal.SIGINT, self.stop)
         signal.signal(signal.SIGTERM, self.stop)  # need
 
     def stop(self, signum):
+        """stop"""
         logging.warning("Supervisor    :" + signum)
         self.running = False
 
     def stopWorkers(self):
+        """stop worker"""
         logging.warning("Supervisor    : close threads.")
         for worker in self.workers:
             worker.kill()
 
     def main(self):
+        """setup logging and workers"""
         format = "%(asctime)s: %(message)s"
         logging.basicConfig(format=format, level=logging.INFO,
                             datefmt="%H:%M:%S")

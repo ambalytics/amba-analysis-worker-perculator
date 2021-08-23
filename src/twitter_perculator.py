@@ -13,10 +13,24 @@ from event_stream.event import Event
 
 @lru_cache(maxsize=100)
 def get_publication_from_mongo(collection, doi):
+    """get a publication from mongo db using a collection and a doi.
+    this is cached up to 100
+
+        Arguments:
+            collection: the collection to use
+            doi: the doi
+    """
     return collection.find_one({"doi": doi})
 
 @lru_cache(maxsize=100)
 def get_publication_from_amba(amba_client, doi):
+    """get a publication from amba client using a collection and a doi.
+        this is cached up to 100
+
+        Arguments:
+            amba_client: the amba_client to use
+            doi: the doi
+    """
     query = gql(
         """
         query getPublication($doi: [String!]!) {
@@ -86,7 +100,6 @@ def get_publication_from_amba(amba_client, doi):
     params = {"doi": doi}
     result = amba_client.execute(query, variable_values=params)
     if 'publicationsByDoi' in result and len(result['publicationsByDoi']) > 0:
-        # todo better way?
         publication = result['publicationsByDoi'][0]
         return publication
     else:
@@ -95,6 +108,7 @@ def get_publication_from_amba(amba_client, doi):
 
 
 class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
+    """ link events to doi and if possible add a publication to it """
     state = "unlinked"
     group_id = "perculator"
     relation_type = "discusses"
@@ -110,12 +124,18 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         'url': "https://api.ambalytics.cloud/entities",
     }
 
-    # todo if full links in doi it must be error on confirming side?
+    # todo --if full links in doi it must be error on confirming side?
     def on_message(self, json_msg):
+        """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
+
+        Arguments:
+            json_msg: json message representing a event
+        """
         e = Event()
         e.from_json(json_msg)
         e.data['obj']['data'] = {}
 
+        # todo check that source_id is twitter
         # json_msg = e.data['subj']['data']
         # logging.warning(self.log + "on message twitter perculator")
 
@@ -169,9 +189,14 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                         break
             else:
                 logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                # todo put into unknown
 
     def add_publication(self, event, publication):
+        """add a publication to an event
+
+        Arguments:
+            event: the event we wan't to add a publication to
+            publication: the publication to add
+        """
         logging.warning(self.log + "linked publication")
         event.data['obj']['data'] = publication
         doi_base_url = "https://doi.org/"  # todo
@@ -180,10 +205,14 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         event.set('obj_id', event.data['obj']['pid'])
 
     def prepare_amba_connection(self):
+        """prepare the amba connection abd setup the client
+        """
         transport = AIOHTTPTransport(url=self.config['url'])
         self.amba_client = Client(transport=transport, fetch_schema_from_transport=True)
 
     def prepare_mongo_connection(self):
+        """prepare mongo connection and setup the client
+        """
         self.mongo_client = pymongo.MongoClient(host=self.config['mongo_url'],
                                                serverSelectionTimeoutMS=3000,  # 3 second timeout
                                                username="root",
@@ -194,6 +223,11 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
 
     def get_publication_info(self, doi):
+        """get publication data for a doi using mongo and amba dbs
+
+        Arguments:
+            doi: the doi for the publication we want
+        """
         if not self.mongo_client:
             self.prepare_mongo_connection()
         publication = get_publication_from_mongo(self.collection, doi)
@@ -214,10 +248,15 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         }
 
 
-    # save the publication to our mongo to
-    # this allows faster access and to store calculated data right on it
-    # additional ist easier only to check one db
     def save_publication_to_mongo(self, publication):
+        """ save the publication to our mongo to
+            this allows faster access and to store calculated data right on it
+            additional ist easier only to check one db
+            use doi as id and key
+
+        Arguments:
+            publication: the publication to save
+        """
         logging.debug('save publication to mongo')
         try:
             # publication['_id'] = publication['id']
