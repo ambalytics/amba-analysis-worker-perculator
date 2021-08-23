@@ -1,5 +1,8 @@
-pymongo
+lxml
 amba-event-stream
+ruamel.yaml
+requests
+pymongo
 
 mkdocs
 mkdocs-material
