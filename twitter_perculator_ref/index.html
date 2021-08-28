@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.5">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.f7f47774.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.be71726b.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -340,6 +340,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#twitter_perculator.TwitterPerculator.save_not_perculated" class="md-nav__link">
+    save_not_perculated()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#twitter_perculator.TwitterPerculator.save_publication_to_mongo" class="md-nav__link">
     save_publication_to_mongo()
   </a>
@@ -465,6 +472,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#twitter_perculator.TwitterPerculator.save_not_perculated" class="md-nav__link">
+    save_not_perculated()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#twitter_perculator.TwitterPerculator.save_publication_to_mongo" class="md-nav__link">
     save_publication_to_mongo()
   </a>
@@ -544,6 +558,9 @@
 
 
   <div class="doc doc-children">
+
+
+
 
 
 
@@ -663,8 +680,6 @@
 <span class="sd">    Arguments:</span>
 <span class="sd">        doi: the doi for the publication we want</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_client</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_mongo_connection</span><span class="p">()</span>
     <span class="n">publication</span> <span class="o">=</span> <span class="n">get_publication_from_mongo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span> <span class="n">doi</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">publication</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;get publication from mongo&#39;</span><span class="p">)</span>
@@ -701,7 +716,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic</p>
+      <p>the on message function to be implemented in own classes</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -717,7 +732,7 @@
       <tr>
         <td><code>json_msg</code></td>
         <td><code></code></td>
-        <td><p>json message representing a event</p></td>
+        <td><p>the message to do stuff with</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -725,6 +740,8 @@
         <details class="quote">
           <summary>Source code in <code>src/twitter_perculator.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_msg</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_client</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_mongo_connection</span><span class="p">()</span>
     <span class="sd">&quot;&quot;&quot;either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic</span>
 
 <span class="sd">    Arguments:</span>
@@ -786,8 +803,12 @@
                     <span class="c1"># publish_message(producer, parsed_topic_name, &#39;parsed&#39;,</span>
                     <span class="c1">#                 json.dumps(json_msg[&#39;data&#39;], indent=2).encode(&#39;utf-8&#39;))</span>
                     <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; no doi&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">save_not_perculated</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; no doi&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_not_perculated</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -845,12 +866,67 @@
     <span class="sd">&quot;&quot;&quot;prepare mongo connection and setup the client</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">mongo_client</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;mongo_url&#39;</span><span class="p">],</span>
-                                           <span class="n">serverSelectionTimeoutMS</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>  <span class="c1"># 3 second timeout</span>
-                                           <span class="n">username</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-                                           <span class="n">password</span><span class="o">=</span><span class="s2">&quot;example&quot;</span>
-                                           <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_client</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;mongo_client&#39;</span><span class="p">]]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;mongo_collection&#39;</span><span class="p">]]</span>
+                                            <span class="n">serverSelectionTimeoutMS</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>  <span class="c1"># 3 second timeout</span>
+                                            <span class="n">username</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
+                                            <span class="n">password</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_client</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;mongo_client&#39;</span><span class="p">]]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;mongo_collection&#39;</span><span class="p">]]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">collectionFailed</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;failed&#39;</span><span class="p">]</span>  <span class="c1"># todo only debug?</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="twitter_perculator.TwitterPerculator.save_not_perculated" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">save_not_perculated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>save thea not peruclated event for debug</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>event</code></td>
+        <td><code>Event</code></td>
+        <td><p>the event to save</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/twitter_perculator.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">save_not_perculated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; save thea not peruclated event for debug</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        event: the event to save</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;save publication to mongo&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collectionFailed</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DuplicateKeyError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;MongoDB, not perculated event &quot;</span> <span class="o">%</span> <span class="n">event</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -911,7 +987,7 @@
         <span class="c1"># publication[&#39;_id&#39;] = publication[&#39;id&#39;]</span>
         <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span>
         <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;amba&#39;</span>
-        <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;source-a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;perculator&#39;</span> <span class="c1"># todo remove</span>
+        <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;source-a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;perculator&#39;</span>  <span class="c1"># todo remove</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">publication</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DuplicateKeyError</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;MongoDB publication, Duplicate found, continue&quot;</span> <span class="o">%</span> <span class="n">publication</span><span class="p">)</span>
@@ -976,8 +1052,7 @@ this is cached up to 100</p>
 </table>
         <details class="quote">
           <summary>Source code in <code>src/twitter_perculator.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_publication_from_amba</span><span class="p">(</span><span class="n">amba_client</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_publication_from_amba</span><span class="p">(</span><span class="n">amba_client</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;get a publication from amba client using a collection and a doi.</span>
 <span class="sd">        this is cached up to 100</span>
 
@@ -1088,8 +1163,7 @@ this is cached up to 100</p>
 
         <details class="quote">
           <summary>Source code in <code>src/twitter_perculator.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_publication_from_mongo</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_publication_from_mongo</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;get a publication from mongo db using a collection and a doi.</span>
 <span class="sd">    this is cached up to 100</span>
 
@@ -1184,10 +1258,10 @@ this is cached up to 100</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.709b4209.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.febc23d1.min.js"></script>
+      <script src="../assets/javascripts/bundle.56a63758.min.js"></script>
       
     
   </body>
