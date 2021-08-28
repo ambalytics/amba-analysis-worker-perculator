@@ -11,7 +11,6 @@ from event_stream.event_stream_producer import EventStreamProducer
 from event_stream.event import Event
 
 
-@lru_cache(maxsize=100)
 def get_publication_from_mongo(collection, doi):
     """get a publication from mongo db using a collection and a doi.
     this is cached up to 100
@@ -22,7 +21,7 @@ def get_publication_from_mongo(collection, doi):
     """
     return collection.find_one({"doi": doi})
 
-@lru_cache(maxsize=100)
+
 def get_publication_from_amba(amba_client, doi):
     """get a publication from amba client using a collection and a doi.
         this is cached up to 100
@@ -116,6 +115,10 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     amba_client = None
     mongo_client = None
+    collectionFailed = None
+    collection = None
+
+    process_number = 2
 
     config = {
         'mongo_url': "mongodb://mongo_db:27017/",
@@ -126,6 +129,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     # todo --if full links in doi it must be error on confirming side?
     def on_message(self, json_msg):
+        if not self.mongo_client:
+            self.prepare_mongo_connection()
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
 
         Arguments:
@@ -187,8 +192,12 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                         # publish_message(producer, parsed_topic_name, 'parsed',
                         #                 json.dumps(json_msg['data'], indent=2).encode('utf-8'))
                         break
+                    else:
+                        logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
+                        self.save_not_perculated(e)
             else:
                 logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
+                self.save_not_perculated(e)
 
     def add_publication(self, event, publication):
         """add a publication to an event
@@ -214,13 +223,12 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         """prepare mongo connection and setup the client
         """
         self.mongo_client = pymongo.MongoClient(host=self.config['mongo_url'],
-                                               serverSelectionTimeoutMS=3000,  # 3 second timeout
-                                               username="root",
-                                               password="example"
-                                               )
-        self.db = self.mongo_client[self.config['mongo_client']]
-        self.collection = self.db[self.config['mongo_collection']]
-
+                                                serverSelectionTimeoutMS=3000,  # 3 second timeout
+                                                username="root",
+                                                password="example")
+        db = self.mongo_client[self.config['mongo_client']]
+        self.collection = db[self.config['mongo_collection']]
+        self.collectionFailed = db['failed']  # todo only debug?
 
     def get_publication_info(self, doi):
         """get publication data for a doi using mongo and amba dbs
@@ -228,8 +236,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         Arguments:
             doi: the doi for the publication we want
         """
-        if not self.mongo_client:
-            self.prepare_mongo_connection()
         publication = get_publication_from_mongo(self.collection, doi)
         if publication:
             logging.debug('get publication from mongo')
@@ -247,6 +253,18 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             'doi': doi
         }
 
+    def save_not_perculated(self, event: Event):
+        """ save thea not peruclated event for debug
+
+        Arguments:
+            event: the event to save
+        """
+        logging.debug('save publication to mongo')
+        try:
+            event.data['_id'] = event.data['id']
+            self.collectionFailed.insert_one(event.data)
+        except pymongo.errors.DuplicateKeyError:
+            logging.warning("MongoDB, not perculated event " % event)
 
     def save_publication_to_mongo(self, publication):
         """ save the publication to our mongo to
@@ -262,7 +280,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             # publication['_id'] = publication['id']
             publication['_id'] = publication['doi']
             publication['source'] = 'amba'
-            publication['source-a'] = 'perculator' # todo remove
+            publication['source-a'] = 'perculator'  # todo remove
             self.collection.insert_one(publication)
         except pymongo.errors.DuplicateKeyError:
             logging.warning("MongoDB publication, Duplicate found, continue" % publication)

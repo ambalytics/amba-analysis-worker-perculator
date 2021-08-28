@@ -1,3 +1,5 @@
+"""Helper Class providing multiple static functions to extract a doi from a url """
+
 import json
 import logging
 import re
@@ -136,10 +138,11 @@ def get_lxml(page):
     """
     content = html.fromstring(page.content)
     result = set([])
+    # todo not only head but also body
     for meta in content.xpath('//html//head//meta'):
         for name, value in sorted(meta.items()):
             # logging.debug(name)
-            if value.strip().lower() in ['citation_doi', 'dc.identifier', 'evt-doipage']:
+            if value.strip().lower() in ['citation_doi', 'dc.identifier', 'evt-doipage', 'news_doi"']:
                 # logging.debug(meta.get('content'))
                 result.add(meta.get('content'))
     return result
@@ -185,7 +188,7 @@ def url_doi_check(data):
     return doi_data
 
 
-@lru_cache(maxsize=500)
+@lru_cache(maxsize=10000)
 def link_url(url):
     """link a url to a valid doi,
     it will try to get potential dois using multiple regex and than check if their are valid and than return the doi
