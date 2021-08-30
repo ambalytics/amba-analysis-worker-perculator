@@ -139,10 +139,10 @@ def get_lxml(page):
     content = html.fromstring(page.content)
     result = set([])
     # todo not only head but also body
-    for meta in content.xpath('//html//head//meta'):
+    for meta in content.xpath('//html//meta'):
         for name, value in sorted(meta.items()):
-            # logging.debug(name)
-            if value.strip().lower() in ['citation_doi', 'dc.identifier', 'evt-doipage', 'news_doi"']:
+            # logging.debug(name)DC.Identifier
+            if value.strip().lower() in ['citation_doi', 'dc.identifier', 'evt-doipage', 'news_doi', 'citation_doi']:
                 # logging.debug(meta.get('content'))
                 result.add(meta.get('content'))
     return result
