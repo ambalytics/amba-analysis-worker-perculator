@@ -123,7 +123,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     process_number = 2
 
     config = {
-        'mongo_url': "mongodb://mongo-db:27017/",
+        'mongo_url': "mongodb://mongo_db:27017/",
         'mongo_client': "events",
         'mongo_collection': "publication",
         'url': "https://api.ambalytics.cloud/entities",
