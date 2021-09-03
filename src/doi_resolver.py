@@ -5,6 +5,8 @@ import logging
 import re
 import requests
 import time
+
+import urllib3
 from lxml import html
 from functools import lru_cache
 
@@ -118,7 +120,21 @@ def get_response(url, s):
             url: the url to get
             s: the session to use
     """
-    return s.get(url)
+    try :
+        result = s.get(url, timeout=5)
+    except ConnectionRefusedError:
+        logging.warning('url error')
+        s = Session()
+        # get the response for the provided url
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
+            'Pragma': 'no-cache'
+        }
+        s.headers.update(headers)
+    else:
+        return result
+    return None
+
 
 
 def search_fulltext(r):
@@ -217,11 +233,12 @@ def link_url(url):
     r = get_response(url, s)
 
     # check if the doi is in any meta tag
-    pot_doi = get_lxml(r)
-    doi = check_doi_list_valid(get_filtered_dois_from_meta(pot_doi))
-    if doi and doi != set([]):
-        logging.debug('meta')
-        return doi
+    if r:
+        pot_doi = get_lxml(r)
+        doi = check_doi_list_valid(get_filtered_dois_from_meta(pot_doi))
+        if doi and doi != set([]):
+            logging.debug('meta')
+            return doi
 
     # check if crossref knows this url and returns the doi
     doi = crossref_url_search(url)
@@ -229,11 +246,12 @@ def link_url(url):
         logging.debug('crossref')
         return doi
 
-    # do a fulltext search of the url
-    doi = check_doi_list_valid(search_fulltext(r))
-    if doi:
-        logging.debug('fulltext')
-        return doi
+    if r:
+        # do a fulltext search of the url
+        doi = check_doi_list_valid(search_fulltext(r))
+        if doi:
+            logging.debug('fulltext')
+            return doi
 
     return False
 

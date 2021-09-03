@@ -1,6 +1,7 @@
 import json
 import logging
 import doi_resolver
+from event_stream.dao import DAO
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 from functools import lru_cache
@@ -117,6 +118,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     mongo_client = None
     collectionFailed = None
     collection = None
+    dao = None
 
     process_number = 2
 
@@ -129,6 +131,9 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     # todo --if full links in doi it must be error on confirming side?
     def on_message(self, json_msg):
+        if not self.dao:
+            self.dao = DAO()
+
         if not self.mongo_client:
             self.prepare_mongo_connection()
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
@@ -276,6 +281,14 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             publication: the publication to save
         """
         logging.debug('save publication to mongo')
+
+        publication['source_id'] = [ {
+                        'title': 'Amba',
+                        'url': 'https://analysis.ambalytics.cloud/',
+                        'license': 'MIT'
+                    }]
+        pub = self.dao.save_publication(publication)
+
         try:
             # publication['_id'] = publication['id']
             publication['_id'] = publication['doi']
