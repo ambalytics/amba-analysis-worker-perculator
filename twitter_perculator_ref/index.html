@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.5">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.be71726b.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -577,6 +577,7 @@
 
 
 
+
   <div class="doc doc-object doc-method">
 
 
@@ -740,6 +741,9 @@
         <details class="quote">
           <summary>Source code in <code>src/twitter_perculator.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_msg</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dao</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dao</span> <span class="o">=</span> <span class="n">DAO</span><span class="p">()</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_client</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_mongo_connection</span><span class="p">()</span>
     <span class="sd">&quot;&quot;&quot;either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic</span>
@@ -983,6 +987,14 @@
 <span class="sd">        publication: the publication to save</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;save publication to mongo&#39;</span><span class="p">)</span>
+
+    <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;source_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Amba&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://analysis.ambalytics.cloud/&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;license&#39;</span><span class="p">:</span> <span class="s1">&#39;MIT&#39;</span>
+                <span class="p">}]</span>
+    <span class="n">pub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dao</span><span class="o">.</span><span class="n">save_publication</span><span class="p">(</span><span class="n">publication</span><span class="p">)</span>
+
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># publication[&#39;_id&#39;] = publication[&#39;id&#39;]</span>
         <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span>
@@ -1261,7 +1273,7 @@ this is cached up to 100</p>
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.56a63758.min.js"></script>
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
       
     
   </body>
