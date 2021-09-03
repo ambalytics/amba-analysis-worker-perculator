@@ -121,10 +121,14 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     dao = None
 
     process_number = 2
+    
+    mongo_host = os.getenv('MONGO_HOST', "mongo-db")
+    mongo_port = os.getenv('MONGO_PORT', "27017")
+    mongo_db = os.getenv('MONGO_DB', "events")
 
     config = {
-        'mongo_url': "mongodb://mongo-db:27017/",
-        'mongo_client': "events",
+        'mongo_url': "mongodb://" + mongo_host + ":" + mongo_port + "/",
+        'mongo_client': mongo_db,
         'mongo_collection': "publication",
         'url': "https://api.ambalytics.cloud/entities",
     }
