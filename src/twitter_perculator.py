@@ -117,7 +117,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     amba_client = None
     dao = None
 
-    process_number = 2
+    process_number = 3
 
     config = {
         'url': "https://api.ambalytics.cloud/entities",
@@ -142,7 +142,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         # logging.warning(self.log + "on message twitter perculator")
 
         if 'id' in e.data['subj']['data']:
-            logging.warning(self.log + e.data['subj']['data']['id'])
+            # logging.warning(self.log + e.data['subj']['data']['id'])
 
             # we use the id for mongo
             e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
@@ -151,20 +151,9 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             running = False
             # check for doi recognition on tweet self
             doi = doi_resolver.url_doi_check(e.data['subj']['data'])
-            # logging.warning('doi 1 ' + str(doi))
             if doi is not False:
-                e.data['obj']['data']['doi'] = doi
-                # e.data['doiTemp'] = doi
-                publication = self.get_publication_info(doi)
-                self.add_publication(e, publication)
+                self.update_event(e, doi)
 
-                if 'title' in publication:
-                    e.set('state', 'linked')
-                    logging.warning('publish linked message of doi ')
-                else:
-                    e.set('state', 'unknown')
-
-                self.publish(e)
                 # check the includes object for the original tweet url
             elif 'tweets' in e.data['subj']['data']['includes']:
                 # logging.warning('tweets')
@@ -173,21 +162,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                     # logging.warning('doi 2 ' + str(doi))
                     if doi is not False:
                         # use first doi we get
-                        # logging.warning(self.log + e.data['subj']['data']['_id'] + " doi includes")
-                        e.data['obj']['data']['doi'] = doi
-                        # e.data['doiTemp'] = doi
-                        publication = self.get_publication_info(doi)
-                        self.add_publication(e, publication)
-
-                        if 'title' in publication:
-                            e.set('state', 'linked')
-                            logging.warning('publish linked message of doi in includes')
-                        else:
-                            e.set('state', 'unknown')
-
-                        self.publish(e)
-                        # publish_message(producer, parsed_topic_name, 'parsed',
-                        #                 json.dumps(json_msg['data'], indent=2).encode('utf-8'))
+                        self.update_event(e, doi)
                         break
                     else:
                         logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
@@ -195,6 +170,24 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             else:
                 logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
                 # self.save_not_perculated(e)
+        else:
+            logging.warning('no id')
+
+    def update_event(self, event, doi):
+        """update the event either with publication or just with doi and set the state accordingly
+        """
+        event.data['obj']['data']['doi'] = doi
+        publication = self.get_publication_info(doi)
+
+        if publication and isinstance(publication, dict) and 'title' in publication:
+            self.add_publication(event, publication)
+            event.set('state', 'linked')
+        else:
+            self.add_publication(event, {'doi': doi})
+            event.set('state', 'unknown')
+
+        logging.warning(event)
+        self.publish(event)
 
     def add_publication(self, event, publication):
         """add a publication to an event
