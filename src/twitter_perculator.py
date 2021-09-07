@@ -115,32 +115,24 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     log = "TwitterPerculator "
 
     amba_client = None
-    mongo_client = None
-    collectionFailed = None
-    collection = None
     dao = None
 
     process_number = 2
 
     config = {
-        'mongo_url': "mongodb://mongo_db:27017/",
-        'mongo_client': "events",
-        'mongo_collection': "publication",
         'url': "https://api.ambalytics.cloud/entities",
     }
 
     # todo --if full links in doi it must be error on confirming side?
     def on_message(self, json_msg):
-        if not self.dao:
-            self.dao = DAO()
-
-        if not self.mongo_client:
-            self.prepare_mongo_connection()
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
 
         Arguments:
             json_msg: json message representing a event
         """
+        if not self.dao:
+            self.dao = DAO()
+
         e = Event()
         e.from_json(json_msg)
         e.data['obj']['data'] = {}
@@ -199,10 +191,10 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                         break
                     else:
                         logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                        self.save_not_perculated(e)
+                        # self.save_not_perculated(e)
             else:
                 logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                self.save_not_perculated(e)
+                # self.save_not_perculated(e)
 
     def add_publication(self, event, publication):
         """add a publication to an event
@@ -224,76 +216,39 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         transport = AIOHTTPTransport(url=self.config['url'])
         self.amba_client = Client(transport=transport, fetch_schema_from_transport=True)
 
-    def prepare_mongo_connection(self):
-        """prepare mongo connection and setup the client
-        """
-        self.mongo_client = pymongo.MongoClient(host=self.config['mongo_url'],
-                                                serverSelectionTimeoutMS=3000,  # 3 second timeout
-                                                username="root",
-                                                password="example")
-        db = self.mongo_client[self.config['mongo_client']]
-        self.collection = db[self.config['mongo_collection']]
-        self.collectionFailed = db['failed']  # todo only debug?
-
     def get_publication_info(self, doi):
         """get publication data for a doi using mongo and amba dbs
 
         Arguments:
             doi: the doi for the publication we want
         """
-        publication = get_publication_from_mongo(self.collection, doi)
+        publication = self.dao.get_publication(doi)
         if publication:
-            logging.debug('get publication from mongo')
+            logging.warning(publication)
+            logging.debug('get publication from db')
             return publication
 
         if not self.amba_client:
             self.prepare_amba_connection()
         publication = get_publication_from_amba(self.amba_client, doi)
+
         if publication:
             logging.debug('get publication from amba')
-            self.save_publication_to_mongo(publication)
+            publication = self.dao.save_publication(publication)
             return publication
 
         return {
             'doi': doi
         }
 
-    def save_not_perculated(self, event: Event):
-        """ save thea not peruclated event for debug
-
-        Arguments:
-            event: the event to save
+    @staticmethod
+    def start(i=0):
+        """start the consumer
         """
-        logging.debug('save publication to mongo')
-        try:
-            event.data['_id'] = event.data['id']
-            self.collectionFailed.insert_one(event.data)
-        except pymongo.errors.DuplicateKeyError:
-            logging.warning("MongoDB, not perculated event " % event)
+        tp = TwitterPerculator(i)
+        logging.debug(TwitterPerculator.log + 'Start %s' % str(i))
+        tp.consume()
 
-    def save_publication_to_mongo(self, publication):
-        """ save the publication to our mongo to
-            this allows faster access and to store calculated data right on it
-            additional ist easier only to check one db
-            use doi as id and key
 
-        Arguments:
-            publication: the publication to save
-        """
-        logging.debug('save publication to mongo')
-
-        publication['source_id'] = [ {
-                        'title': 'Amba',
-                        'url': 'https://analysis.ambalytics.cloud/',
-                        'license': 'MIT'
-                    }]
-        pub = self.dao.save_publication(publication)
-
-        try:
-            # publication['_id'] = publication['id']
-            publication['_id'] = publication['doi']
-            publication['source'] = 'amba'
-            publication['source-a'] = 'perculator'  # todo remove
-            self.collection.insert_one(publication)
-        except pymongo.errors.DuplicateKeyError:
-            logging.warning("MongoDB publication, Duplicate found, continue" % publication)
+if __name__ == '__main__':
+    TwitterPerculator.start(1)
