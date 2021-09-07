@@ -11,7 +11,7 @@ from lxml import html
 from functools import lru_cache
 
 from requests import Session
-from urllib3.exceptions import ReadTimeoutError
+from urllib3.exceptions import ReadTimeoutError, SSLError
 
 
 def check_doi_list_valid(potential_dois):
@@ -123,7 +123,7 @@ def get_response(url, s):
     """
     try :
         result = s.get(url, timeout=5)
-    except (ConnectionRefusedError, ReadTimeoutError):
+    except (ConnectionRefusedError, SSLError, ReadTimeoutError):
         logging.warning('Perculator')
         s = Session()
         # get the response for the provided url
