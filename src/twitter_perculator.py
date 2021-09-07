@@ -4,8 +4,6 @@ import doi_resolver
 from event_stream.dao import DAO
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
-from functools import lru_cache
-import pymongo
 
 from event_stream.event_stream_consumer import EventStreamConsumer
 from event_stream.event_stream_producer import EventStreamProducer
