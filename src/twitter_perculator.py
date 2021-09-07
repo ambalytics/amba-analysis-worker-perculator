@@ -203,7 +203,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             event: the event we wan't to add a publication to
             publication: the publication to add
         """
-        logging.warning(self.log + "linked publication")
+        logging.debug(self.log + "linked publication")
         event.data['obj']['data'] = publication
         doi_base_url = "https://doi.org/"  # todo
         event.data['obj']['pid'] = doi_base_url + publication['doi']
@@ -223,8 +223,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             doi: the doi for the publication we want
         """
         publication = self.dao.get_publication(doi)
-        if publication:
-            logging.warning(publication)
+        if publication and isinstance(publication, dict):
+            logging.debug(publication)
             logging.debug('get publication from db')
             return publication
 
