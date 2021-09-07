@@ -10,4 +10,4 @@ RUN pip install --pre gql[all]
 COPY src/requirements.txt /requirements.txt
 RUN pip install -r src/requirements.txt
 
-CMD [ "python", "./src/twitter_supervisor.py" ]
+ENTRYPOINT ["/bin/bash", "-c", "./scripts/entrypoint.sh"]
