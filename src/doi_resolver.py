@@ -124,7 +124,7 @@ def get_response(url, s):
     try :
         result = s.get(url, timeout=5)
     except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
-            requests.exceptions.ReadTimeout, NewConnectionError, requests.exceptions.SSLError):
+            requests.exceptions.ReadTimeout, NewConnectionError, requests.exceptions.SSLError, ConnectionError):
         logging.warning('Perculator error, reset session')
         s = Session()
         # get the response for the provided url
