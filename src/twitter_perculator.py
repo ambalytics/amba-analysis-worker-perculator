@@ -151,7 +151,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             doi = doi_resolver.url_doi_check(e.data['subj']['data'])
             if doi is not False:
                 self.update_event(e, doi)
-
+            # check if we have the conversation_id in our db
+            # where discussionData.subjId == conversation_id
                 # check the includes object for the original tweet url
             elif 'tweets' in e.data['subj']['data']['includes']:
                 # logging.warning('tweets')

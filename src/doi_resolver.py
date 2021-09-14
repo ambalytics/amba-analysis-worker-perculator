@@ -24,7 +24,7 @@ def check_doi_list_valid(potential_dois):
     for doi in potential_dois:
         if doi is not None and doi:
             pdoi = pdoi + doi + ','
-    pre = "http://doi.org/doiRA/" # todo
+    pre = "http://doi.org/doiRA/"  # todo
     rw = False
     if pdoi != '':
         r = requests.get(pre + pdoi)
@@ -51,7 +51,7 @@ def crossref_url_search(url):
                 if 'message' in json_response:
                     if 'events' in json_response['message']:
                         for event in json_response['message']['events']:
-                            return event['obj_id'][16:] # https://doi.org/ -> 16
+                            return event['obj_id'][16:]  # https://doi.org/ -> 16
     return False
 
 
@@ -111,8 +111,8 @@ def get_dois_regex(regex, temp_doi):
 #         if start == -1: return
 #         yield start
 #         start += len(sub)
-
-
+# cache in case of duplicates
+@lru_cache(maxsize=100)
 def get_response(url, s):
     """get a response from a given url using a given session s, a session can be used for headers,
     this function is cached up to 100 elements
@@ -121,7 +121,7 @@ def get_response(url, s):
             url: the url to get
             s: the session to use
     """
-    try :
+    try:
         result = s.get(url, timeout=5)
     except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
             requests.exceptions.ReadTimeout, NewConnectionError, requests.exceptions.SSLError, ConnectionError):
@@ -136,7 +136,6 @@ def get_response(url, s):
     else:
         return result
     return None
-
 
 
 def search_fulltext(r):
@@ -157,7 +156,7 @@ def get_lxml(page):
     content = html.fromstring(page.content)
     result = set([])
     # todo not only head but also body
-    for meta in content.xpath('//html//meta'):
+    for meta in content.xpath('//meta'):
         for name, value in sorted(meta.items()):
             # logging.debug(name)DC.Identifier
             if value.strip().lower() in ['citation_doi', 'dc.identifier', 'evt-doipage', 'news_doi', 'citation_doi']:
@@ -183,6 +182,7 @@ def get_filtered_dois_from_meta(potential_dois):
         if doi_re.search(t) is not None:
             r.add(t)
     return r
+
 
 def url_doi_check(data):
     """check data for urls,
