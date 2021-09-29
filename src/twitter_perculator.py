@@ -44,47 +44,14 @@ def get_publication_from_amba(amba_client, doi):
           title,
           normalizedTitle,
           year,
-          citations {
-              id,
-              type,
-              doi,
-              abstract,
-              pubDate,
-              publisher,
-              rank,
-              citationCount,
-              title,
-              normalizedTitle,
-              year
-          },
-          refs  {
-              id,
-              type,
-              doi,
-              abstract,
-              pubDate,
-              publisher,
-              rank,
-              citationCount,
-              title,
-              normalizedTitle,
-              year
-          },
           authors {
-              id,
               name,
               normalizedName,
-              pubCount,
-              citationCount,
-              rank
           },
           fieldsOfStudy {
-              score,
               name,
               normalizedName,
               level,
-              rank,
-              citationCount
           }
         } 
     }
@@ -99,6 +66,18 @@ def get_publication_from_amba(amba_client, doi):
     result = amba_client.execute(query, variable_values=params)
     if 'publicationsByDoi' in result and len(result['publicationsByDoi']) > 0:
         publication = result['publicationsByDoi'][0]
+        # todo unset
+        publication['pub_date'] = publication['pubDate']
+        publication['citation_count'] = publication['citationCount']
+        publication['normalized_title'] = publication['normalizedTitle']
+
+        for a in publication['authors']:
+            a['normalized_name'] = a['normalizedName']
+
+        for f in publication['fieldsOfStudy']:
+            f['normalized_name'] = f['normalizedName']
+        publication['field_of_study'] = publication['fieldsOfStudy']
+
         return publication
     else:
         logging.warning('unable to get data for doi: %s' % doi)
@@ -163,12 +142,12 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                         # use first doi we get
                         self.update_event(e, doi)
                         break
-                    else:
-                        logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                        # self.save_not_perculated(e)
+
+                logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
+                # logging.warning(e.data['subj']['data']['includes'])
             else:
                 logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                # self.save_not_perculated(e)
+                # logging.warning(e.data['subj']['data'])
         else:
             logging.warning('no id')
 
@@ -185,7 +164,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             self.add_publication(event, {'doi': doi})
             event.set('state', 'unknown')
 
-        logging.warning(event)
         self.publish(event)
 
     def add_publication(self, event, publication):
