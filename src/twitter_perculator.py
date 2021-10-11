@@ -2,86 +2,12 @@ import json
 import logging
 import doi_resolver
 from event_stream.dao import DAO
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
+import os
+import sentry_sdk
 
 from event_stream.event_stream_consumer import EventStreamConsumer
 from event_stream.event_stream_producer import EventStreamProducer
 from event_stream.event import Event
-
-
-def get_publication_from_mongo(collection, doi):
-    """get a publication from mongo db using a collection and a doi.
-    this is cached up to 100
-
-        Arguments:
-            collection: the collection to use
-            doi: the doi
-    """
-    return collection.find_one({"doi": doi})
-
-
-def get_publication_from_amba(amba_client, doi):
-    """get a publication from amba client using a collection and a doi.
-        this is cached up to 100
-
-        Arguments:
-            amba_client: the amba_client to use
-            doi: the doi
-    """
-    query = gql(
-        """
-        query getPublication($doi: [String!]!) {
-         publicationsByDoi(doi: $doi) {
-          id,
-          type,
-          doi,
-          abstract,
-          pubDate,
-          publisher,
-          rank,
-          citationCount,
-          title,
-          normalizedTitle,
-          year,
-          authors {
-              name,
-              normalizedName,
-          },
-          fieldsOfStudy {
-              name,
-              normalizedName,
-              level,
-          }
-        } 
-    }
-
-    """)
-
-    # todo  affiliation: Affiliation author
-    #   parents: [FieldOfStudy!]
-    #   children: [FieldOfStudy!]
-
-    params = {"doi": doi}
-    result = amba_client.execute(query, variable_values=params)
-    if 'publicationsByDoi' in result and len(result['publicationsByDoi']) > 0:
-        publication = result['publicationsByDoi'][0]
-        # todo unset
-        publication['pub_date'] = publication['pubDate']
-        publication['citation_count'] = publication['citationCount']
-        publication['normalized_title'] = publication['normalizedTitle']
-
-        for a in publication['authors']:
-            a['normalized_name'] = a['normalizedName']
-
-        for f in publication['fieldsOfStudy']:
-            f['normalized_name'] = f['normalizedName']
-        publication['field_of_study'] = publication['fieldsOfStudy']
-
-        return publication
-    else:
-        logging.warning('unable to get data for doi: %s' % doi)
-    return None
 
 
 class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
@@ -91,7 +17,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     relation_type = "discusses"
     log = "TwitterPerculator "
 
-    amba_client = None
     dao = None
 
     process_number = 3
@@ -114,42 +39,41 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         e.from_json(json_msg)
         e.data['obj']['data'] = {}
 
-        # todo check that source_id is twitter
-        # json_msg = e.data['subj']['data']
-        # logging.warning(self.log + "on message twitter perculator")
+        if e.get('source_id') == 'twitter':
+            # logging.warning(self.log + "on message twitter perculator")
 
-        if 'id' in e.data['subj']['data']:
-            # logging.warning(self.log + e.data['subj']['data']['id'])
+            if 'id' in e.data['subj']['data']:
+                # logging.warning(self.log + e.data['subj']['data']['id'])
 
-            # we use the id for mongo
-            e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
-            # move matching rules to tweet self
-            e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
-            running = False
-            # check for doi recognition on tweet self
-            doi = doi_resolver.url_doi_check(e.data['subj']['data'])
-            if doi is not False:
-                self.update_event(e, doi)
-            # check if we have the conversation_id in our db
-            # where discussionData.subjId == conversation_id
+                # we use the id for mongo
+                e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
+                # move matching rules to tweet self
+                e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
+                running = False
+                # check for doi recognition on tweet self
+                doi = doi_resolver.url_doi_check(e.data['subj']['data'])
+                if doi is not False:
+                    self.update_event(e, doi)
+                # check if we have the conversation_id in our db
+                # where discussionData.subjId == conversation_id
                 # check the includes object for the original tweet url
-            elif 'tweets' in e.data['subj']['data']['includes']:
-                # logging.warning('tweets')
-                for tweet in e.data['subj']['data']['includes']['tweets']:
-                    doi = doi_resolver.url_doi_check(tweet)
-                    # logging.warning('doi 2 ' + str(doi))
-                    if doi is not False:
-                        # use first doi we get
-                        self.update_event(e, doi)
-                        break
+                elif 'tweets' in e.data['subj']['data']['includes']:
+                    # logging.warning('tweets')
+                    for tweet in e.data['subj']['data']['includes']['tweets']:
+                        doi = doi_resolver.url_doi_check(tweet)
+                        # logging.warning('doi 2 ' + str(doi))
+                        if doi is not False:
+                            # use first doi we get
+                            self.update_event(e, doi)
+                            break
 
-                logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                # logging.warning(e.data['subj']['data']['includes'])
+                    logging.debug(self.log + e.data['subj']['data']['_id'] + " no doi")
+                    # logging.warning(e.data['subj']['data']['includes'])
+                else:
+                    logging.debug(self.log + e.data['subj']['data']['_id'] + " no doi")
+                    # logging.warning(e.data['subj']['data'])
             else:
-                logging.warning(self.log + e.data['subj']['data']['_id'] + " no doi")
-                # logging.warning(e.data['subj']['data'])
-        else:
-            logging.warning('no id')
+                logging.debug('no id')
 
     def update_event(self, event, doi):
         """update the event either with publication or just with doi and set the state accordingly
@@ -180,12 +104,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         event.data['obj']['alternative-id'] = publication['doi']
         event.set('obj_id', event.data['obj']['pid'])
 
-    def prepare_amba_connection(self):
-        """prepare the amba connection abd setup the client
-        """
-        transport = AIOHTTPTransport(url=self.config['url'])
-        self.amba_client = Client(transport=transport, fetch_schema_from_transport=True)
-
     def get_publication_info(self, doi):
         """get publication data for a doi using mongo and amba dbs
 
@@ -197,10 +115,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             logging.debug(publication)
             logging.debug('get publication from db')
             return publication
-
-        if not self.amba_client:
-            self.prepare_amba_connection()
-        publication = get_publication_from_amba(self.amba_client, doi)
 
         if publication:
             logging.debug('get publication from amba')
@@ -221,4 +135,11 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
 
 if __name__ == '__main__':
+    SENTRY_DSN = os.environ.get('SENTRY_DSN')
+    SENTRY_TRACE_SAMPLE_RATE = os.environ.get('SENTRY_TRACE_SAMPLE_RATE')
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        traces_sample_rate=SENTRY_TRACE_SAMPLE_RATE
+    )
+
     TwitterPerculator.start(1)
