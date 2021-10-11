@@ -1,5 +1,4 @@
-lxml
 amba-event-stream
+lxml
 ruamel.yaml
 requests
-pymongo
