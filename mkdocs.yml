@@ -7,7 +7,6 @@ repo_url: 'https://github.com/ambalytics/amba-analysis-worker-perculator'
 nav:
     - Home: index.md
     - Code Reference:
-        twitter supervisor: twitter_supervisor_ref.md
         twitter perculator: twitter_perculator_ref.md
         doi resolver: doi_resolver_ref.md
 
