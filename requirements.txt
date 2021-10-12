@@ -1,9 +1,8 @@
-lxml
 amba-event-stream
+lxml
 ruamel.yaml
 requests
-pymongo
-
+sentry_sdk
 mkdocs
 mkdocs-material
 mkdocstrings

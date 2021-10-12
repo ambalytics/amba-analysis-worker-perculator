@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.3.3">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -80,7 +80,9 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Amba Analysis Worker Perculator" class="md-header__button md-logo" aria-label="Amba Analysis Worker Perculator" data-md-component="logo">
       
@@ -159,11 +161,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -233,10 +238,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
-      <label class="md-nav__link" for="__nav_2">
-        Code Reference
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Code Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Code Reference" data-md-level="1">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
@@ -245,18 +254,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../twitter_supervisor_ref/" class="md-nav__link">
-        twitter supervisor
-      </a>
-    </li>
-  
-
-          
-            
+              
   
   
   
@@ -267,8 +265,10 @@
     </li>
   
 
+            
           
             
+              
   
   
     
@@ -385,6 +385,7 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -556,7 +557,7 @@
   <tbody>
       <tr>
         <td><code>potential_dois</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>a list of dois that should be checked</p></td>
         <td><em>required</em></td>
       </tr>
@@ -574,7 +575,7 @@
     <span class="k">for</span> <span class="n">doi</span> <span class="ow">in</span> <span class="n">potential_dois</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">doi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">doi</span><span class="p">:</span>
             <span class="n">pdoi</span> <span class="o">=</span> <span class="n">pdoi</span> <span class="o">+</span> <span class="n">doi</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span>
-    <span class="n">pre</span> <span class="o">=</span> <span class="s2">&quot;http://doi.org/doiRA/&quot;</span> <span class="c1"># todo</span>
+    <span class="n">pre</span> <span class="o">=</span> <span class="s2">&quot;http://doi.org/doiRA/&quot;</span>  <span class="c1"># todo</span>
     <span class="n">rw</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">pdoi</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pre</span> <span class="o">+</span> <span class="n">pdoi</span><span class="p">)</span>
@@ -618,7 +619,7 @@
   <tbody>
       <tr>
         <td><code>url</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the url to get a doi for</p></td>
         <td><em>required</em></td>
       </tr>
@@ -641,7 +642,7 @@
                 <span class="k">if</span> <span class="s1">&#39;message&#39;</span> <span class="ow">in</span> <span class="n">json_response</span><span class="p">:</span>
                     <span class="k">if</span> <span class="s1">&#39;events&#39;</span> <span class="ow">in</span> <span class="n">json_response</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]:</span>
                         <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">json_response</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;events&#39;</span><span class="p">]:</span>
-                            <span class="k">return</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;obj_id&#39;</span><span class="p">][</span><span class="mi">16</span><span class="p">:]</span> <span class="c1"># https://doi.org/ -&gt; 16</span>
+                            <span class="k">return</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;obj_id&#39;</span><span class="p">][</span><span class="mi">16</span><span class="p">:]</span>  <span class="c1"># https://doi.org/ -&gt; 16</span>
     <span class="k">return</span> <span class="kc">False</span>
 </code></pre></div>
         </details>
@@ -678,13 +679,13 @@
   <tbody>
       <tr>
         <td><code>regex</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the regex to look for</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>temp_doi</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the doi to use</p></td>
         <td><em>required</em></td>
       </tr>
@@ -738,7 +739,7 @@
   <tbody>
       <tr>
         <td><code>potential_dois</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the dois to filter</p></td>
         <td><em>required</em></td>
       </tr>
@@ -798,7 +799,7 @@
   <tbody>
       <tr>
         <td><code>page</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the page to search</p></td>
         <td><em>required</em></td>
       </tr>
@@ -815,7 +816,7 @@
     <span class="n">content</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
     <span class="c1"># todo not only head but also body</span>
-    <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//html//meta&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//meta&#39;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
             <span class="c1"># logging.debug(name)DC.Identifier</span>
             <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;citation_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;dc.identifier&#39;</span><span class="p">,</span> <span class="s1">&#39;evt-doipage&#39;</span><span class="p">,</span> <span class="s1">&#39;news_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;citation_doi&#39;</span><span class="p">]:</span>
@@ -860,7 +861,7 @@ the result is a set and will likely contain unvalid dois</p>
   <tbody>
       <tr>
         <td><code>text</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the text which should be checked</p></td>
         <td><em>required</em></td>
       </tr>
@@ -931,7 +932,8 @@ this function is cached up to 100 elements</p>
 
         <details class="quote">
           <summary>Source code in <code>src/doi_resolver.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;get a response from a given url using a given session s, a session can be used for headers,</span>
 <span class="sd">    this function is cached up to 100 elements</span>
 
@@ -939,10 +941,11 @@ this function is cached up to 100 elements</p>
 <span class="sd">            url: the url to get</span>
 <span class="sd">            s: the session to use</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span> <span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ConnectionRefusedError</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;url error&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ConnectionRefusedError</span><span class="p">,</span> <span class="n">SSLError</span><span class="p">,</span> <span class="n">ReadTimeoutError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TooManyRedirects</span><span class="p">,</span>
+            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span><span class="p">,</span> <span class="n">NewConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">SSLError</span><span class="p">,</span> <span class="ne">ConnectionError</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Perculator error, reset session&#39;</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
         <span class="c1"># get the response for the provided url</span>
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
@@ -1069,7 +1072,7 @@ this function is cached up to 500 elements</p>
   <tbody>
       <tr>
         <td><code>r</code></td>
-        <td><code></code></td>
+        <td></td>
         <td><p>the response we want to search</p></td>
         <td><em>required</em></td>
       </tr>
@@ -1188,10 +1191,12 @@ prefer expanded_url</p>
     <div class="md-footer-meta__inner md-grid">
       <div class="md-footer-copyright">
         
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
         
       </div>
       
@@ -1203,10 +1208,10 @@ prefer expanded_url</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.8397ff9e.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      <script src="../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>
