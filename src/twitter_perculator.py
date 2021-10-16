@@ -88,7 +88,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             self.add_publication(event, {'doi': doi})
             event.set('state', 'unknown')
 
-        logging.warning(event.get('state'))
         self.publish(event)
 
     def add_publication(self, event, publication):
