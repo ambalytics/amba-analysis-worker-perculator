@@ -21,11 +21,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     process_number = 3
 
-    config = {
-        'url': "https://api.ambalytics.cloud/entities",
-    }
-
-    # todo --if full links in doi it must be error on confirming side?
     def on_message(self, json_msg):
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
 
