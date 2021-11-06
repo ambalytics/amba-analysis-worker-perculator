@@ -113,7 +113,7 @@ def get_dois_regex(regex, temp_doi):
 #         start += len(sub)
 # cache in case of duplicates
 @lru_cache(maxsize=100)
-def get_response(url, s):
+def get_response(url, s, r=0):
     """get a response from a given url using a given session s, a session can be used for headers,
     this function is cached up to 100 elements
 
@@ -122,8 +122,9 @@ def get_response(url, s):
             s: the session to use
     """
     try:
-        result = s.get(url, timeout=5)
-    except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError,
+        result = s.get(url, timeout=10)
+    except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
+            requests.exceptions.ConnectionError,
             requests.exceptions.ReadTimeout, NewConnectionError, requests.exceptions.SSLError, ConnectionError):
         logging.warning('Perculator error, reset session')
         s = Session()
@@ -133,6 +134,8 @@ def get_response(url, s):
             'Pragma': 'no-cache'
         }
         s.headers.update(headers)
+        if r < 5:
+            get_response(url, s, r + 1)
     else:
         return result
     return None
@@ -203,12 +206,12 @@ def url_doi_check(data):
     return doi_data
 
 
-@lru_cache(maxsize=50000)
+@lru_cache(maxsize=10000)
 def link_url(url):
     """link a url to a valid doi,
     it will try to get potential dois using multiple regex and than check if their are valid and than return the doi
     it uses multiple methods to search for the doi,
-    this function is cached up to 500 elements
+    this function is cached up to 10000 elements
 
         Arguments:
             url: the url to get
