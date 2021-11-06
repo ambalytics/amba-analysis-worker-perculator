@@ -726,12 +726,12 @@ TwitterPerculator            (<span title="event_stream.event_stream_consumer.Ev
                         <span class="k">break</span>
 
                 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; no doi&quot;</span><span class="p">)</span>
-                <span class="c1"># logging.warning(e.data[&#39;subj&#39;][&#39;data&#39;][&#39;includes&#39;])</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;includes&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; no doi&quot;</span><span class="p">)</span>
-                <span class="c1"># logging.warning(e.data[&#39;subj&#39;][&#39;data&#39;])</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;no id&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;no id&#39;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>

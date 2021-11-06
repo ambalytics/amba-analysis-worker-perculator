@@ -917,7 +917,7 @@ the result is a set and will likely contain unvalid dois</p>
 
 
 <h2 id="doi_resolver.get_response" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
 
 
 </h2>
@@ -934,7 +934,7 @@ this function is cached up to 100 elements</p>
         <details class="quote">
           <summary>Source code in <code>src/doi_resolver.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;get a response from a given url using a given session s, a session can be used for headers,</span>
 <span class="sd">    this function is cached up to 100 elements</span>
 
@@ -943,8 +943,9 @@ this function is cached up to 100 elements</p>
 <span class="sd">            s: the session to use</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">ConnectionRefusedError</span><span class="p">,</span> <span class="n">SSLError</span><span class="p">,</span> <span class="n">ReadTimeoutError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TooManyRedirects</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ConnectionRefusedError</span><span class="p">,</span> <span class="n">SSLError</span><span class="p">,</span> <span class="n">ReadTimeoutError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TooManyRedirects</span><span class="p">,</span>
+            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span><span class="p">,</span> <span class="n">NewConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">SSLError</span><span class="p">,</span> <span class="ne">ConnectionError</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Perculator error, reset session&#39;</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
@@ -954,6 +955,8 @@ this function is cached up to 100 elements</p>
             <span class="s1">&#39;Pragma&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span>
         <span class="p">}</span>
         <span class="n">s</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">return</span> <span class="kc">None</span>
@@ -980,7 +983,7 @@ this function is cached up to 100 elements</p>
       <p>link a url to a valid doi,
 it will try to get potential dois using multiple regex and than check if their are valid and than return the doi
 it uses multiple methods to search for the doi,
-this function is cached up to 500 elements</p>
+this function is cached up to 10000 elements</p>
 <pre><code>!!! arguments
     url: the url to get
     s: the session to use
@@ -988,12 +991,12 @@ this function is cached up to 500 elements</p>
 
         <details class="quote">
           <summary>Source code in <code>src/doi_resolver.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">50000</span><span class="p">)</span>
+          <div class="highlight"><pre><span></span><code><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">link_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;link a url to a valid doi,</span>
 <span class="sd">    it will try to get potential dois using multiple regex and than check if their are valid and than return the doi</span>
 <span class="sd">    it uses multiple methods to search for the doi,</span>
-<span class="sd">    this function is cached up to 500 elements</span>
+<span class="sd">    this function is cached up to 10000 elements</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            url: the url to get</span>
