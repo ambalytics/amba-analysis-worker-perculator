@@ -68,7 +68,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                     logging.debug(self.log + e.data['subj']['data']['_id'] + " no doi")
                     # logging.warning(e.data['subj']['data'])
             else:
-                logging.debug('no id')
+                logging.warning('no id')
 
     def update_event(self, event, doi):
         """update the event either with publication or just with doi and set the state accordingly
@@ -78,9 +78,11 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
         if publication and isinstance(publication, dict) and 'title' in publication:
             self.add_publication(event, publication)
+            logging.warning('linked')
             event.set('state', 'linked')
         else:
             self.add_publication(event, {'doi': doi})
+            logging.warning('unknown')
             event.set('state', 'unknown')
 
         self.publish(event)
