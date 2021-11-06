@@ -821,7 +821,9 @@
     <span class="n">result</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
     <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//meta&#39;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;citation_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;dc.identifier&#39;</span><span class="p">,</span> <span class="s1">&#39;evt-doipage&#39;</span><span class="p">,</span> <span class="s1">&#39;news_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;citation_doi&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;citation_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;dc.identifier&#39;</span><span class="p">,</span> <span class="s1">&#39;evt-doipage&#39;</span><span class="p">,</span> <span class="s1">&#39;news_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;citation_doi&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;doi&#39;</span><span class="p">,</span> <span class="s1">&#39;DC.DOI&#39;</span><span class="p">,</span> <span class="s1">&#39;DC.Identifier.DOI&#39;</span><span class="p">,</span> <span class="s1">&#39;DOIs&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;bepress_citation_doi&#39;</span><span class="p">,</span> <span class="s1">&#39;rft_id&#39;</span><span class="p">]:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div>
@@ -955,7 +957,8 @@ this function is cached up to 100 elements</p>
             <span class="s1">&#39;Pragma&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span>
         <span class="p">}</span>
         <span class="n">s</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
             <span class="n">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">result</span>
