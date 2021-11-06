@@ -203,7 +203,7 @@ def url_doi_check(data):
     return doi_data
 
 
-@lru_cache(maxsize=10000)
+@lru_cache(maxsize=50000)
 def link_url(url):
     """link a url to a valid doi,
     it will try to get potential dois using multiple regex and than check if their are valid and than return the doi
