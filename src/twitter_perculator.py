@@ -62,11 +62,12 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                             self.update_event(e, doi)
                             break
 
-                    logging.debug(self.log + e.data['subj']['data']['_id'] + " no doi")
-                    logging.warning(e.data['subj']['data']['includes'])
+                    if doi is False:
+                        logging.warning(self.log + " no doi")
+                        logging.debug(e.data['subj']['data']['includes']['tweets'])
                 else:
-                    logging.debug(self.log + e.data['subj']['data']['_id'] + " no doi")
-                    logging.warning(e.data['subj']['data'])
+                    logging.warning(self.log + " no doi")
+                    logging.debug(e.data['subj']['data'])
             else:
                 logging.debug('no id')
 
