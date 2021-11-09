@@ -126,7 +126,7 @@ def get_response(url, s, r=0):
     except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
             requests.exceptions.ConnectionError,
             requests.exceptions.ReadTimeout, NewConnectionError, requests.exceptions.SSLError, ConnectionError):
-        logging.warning('Perculator error, reset session')
+        logging.warning('Percolator error, reset session')
         s = Session()
         # get the response for the provided url
         headers = {
@@ -135,8 +135,11 @@ def get_response(url, s, r=0):
         }
         s.headers.update(headers)
         if r < 3:
+            logging.warning('retry in ' + str(pow(2, r)) + 's')
             time.sleep(pow(2, r))
             get_response(url, s, r + 1)
+        else:
+            return None
     else:
         return result
     return None
@@ -224,12 +227,12 @@ def link_url(url):
             url: the url to get
             s: the session to use
     """
-    logging.debug(url)
+    logging.warning(url)
 
     # check if the url contains the doi
     doi = check_doi_list_valid(get_potential_dois_from_text(url))
     if doi:
-        logging.debug('url')
+        logging.warning('url')
         return doi
 
     s = Session()
@@ -246,20 +249,20 @@ def link_url(url):
         pot_doi = get_lxml(r)
         doi = check_doi_list_valid(get_filtered_dois_from_meta(pot_doi))
         if doi and doi != set([]):
-            logging.debug('meta')
+            logging.warning('meta')
             return doi
 
     # check if crossref knows this url and returns the doi
     doi = crossref_url_search(url)
     if doi:
-        logging.debug('crossref')
+        logging.warning('crossref')
         return doi
 
     if r:
         # do a fulltext search of the url
         doi = check_doi_list_valid(search_fulltext(r))
         if doi:
-            logging.debug('fulltext')
+            logging.warning('fulltext')
             return doi
 
     return False
