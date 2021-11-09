@@ -19,7 +19,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     dao = None
 
-    process_number = 3
+    process_number = 2
 
     def on_message(self, json_msg):
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
@@ -70,6 +70,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                     logging.debug(e.data['subj']['data'])
             else:
                 logging.debug('no id')
+        else:
+            logging.debug('not twitter')
 
     def update_event(self, event, doi):
         """update the event either with publication or just with doi and set the state accordingly
@@ -83,9 +85,9 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             event.set('state', 'linked')
         else:
             self.add_publication(event, {'doi': doi})
-            logging.warning('unknown')
             event.set('state', 'unknown')
 
+        logging.warning(event.get('state'))
         self.publish(event)
 
     def add_publication(self, event, publication):
