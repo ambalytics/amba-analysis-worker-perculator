@@ -204,6 +204,9 @@ def url_doi_check(data):
                     doi_data = link_url(url['expanded_url'])
                 if doi_data is False and 'unwound_url' in url:
                     doi_data = link_url(url['unwound_url'])
+                if doi_data is not False:
+                    return doi_data
+
             if doi_data is not False:
                 return doi_data
     return doi_data
