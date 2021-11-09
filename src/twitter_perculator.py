@@ -19,7 +19,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     dao = None
 
-    process_number = 2
+    process_number = 3
 
     def on_message(self, json_msg):
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
@@ -40,11 +40,11 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             if 'id' in e.data['subj']['data']:
                 # logging.warning(self.log + e.data['subj']['data']['id'])
 
-                # we use the id for mongo
+                # we use the id for mongo todo
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
+                logging.warning(e.data['subj']['data']['_id'])
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
-                running = False
                 # check for doi recognition on tweet self
                 doi = doi_resolver.url_doi_check(e.data['subj']['data'])
                 if doi is not False:
