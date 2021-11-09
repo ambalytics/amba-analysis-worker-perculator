@@ -208,10 +208,10 @@ def url_doi_check(data):
                 if doi_data is False and 'unwound_url' in url:
                     doi_data = link_url(url['unwound_url'])
                 if doi_data is not False:
-                    logging.warning(doi_data)
+                    logging.debug(doi_data)
                     return doi_data
             if doi_data is not False:
-                logging.warning(doi_data)
+                logging.debug(doi_data)
                 return doi_data
     return doi_data
 
@@ -227,12 +227,12 @@ def link_url(url):
             url: the url to get
             s: the session to use
     """
-    logging.warning(url)
+    logging.debug(url)
 
     # check if the url contains the doi
     doi = check_doi_list_valid(get_potential_dois_from_text(url))
     if doi:
-        logging.warning('url')
+        logging.debug('url')
         return doi
 
     s = Session()
@@ -249,20 +249,20 @@ def link_url(url):
         pot_doi = get_lxml(r)
         doi = check_doi_list_valid(get_filtered_dois_from_meta(pot_doi))
         if doi and doi != set([]):
-            logging.warning('meta')
+            logging.debug('meta')
             return doi
 
     # check if crossref knows this url and returns the doi
     doi = crossref_url_search(url)
     if doi:
-        logging.warning('crossref')
+        logging.debug('crossref')
         return doi
 
     if r:
         # do a fulltext search of the url
         doi = check_doi_list_valid(search_fulltext(r))
         if doi:
-            logging.warning('fulltext')
+            logging.debug('fulltext')
             return doi
 
     return False
