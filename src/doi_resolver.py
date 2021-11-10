@@ -209,10 +209,10 @@ def url_doi_check(data):
                 if doi_data is False and 'unwound_url' in url:
                     doi_data = link_url(url['unwound_url'])
                 if doi_data is not False:
-                    logging.warning(doi_data)
+                    logging.debug(doi_data)
                     return doi_data
             if doi_data is not False:
-                logging.warning(doi_data)
+                logging.debug(doi_data)
                 return doi_data
     return doi_data
 
@@ -228,7 +228,7 @@ def link_url(url):
             url: the url to get
             s: the session to use
     """
-    logging.debug(url)
+    logging.warning(url)
 
     # check if the url contains the doi
     doi = check_doi_list_valid(get_potential_dois_from_text(url))
@@ -266,7 +266,6 @@ def link_url(url):
             logging.debug('fulltext')
             return doi
 
-    logging.warning('fail')
     return False
 
 

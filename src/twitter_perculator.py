@@ -75,7 +75,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     def update_event(self, event, doi):
         """update the event either with publication or just with doi and set the state accordingly
         """
-        logging.warning('update event')
         event.data['obj']['data']['doi'] = doi
         publication = self.get_publication_info(doi)
 
