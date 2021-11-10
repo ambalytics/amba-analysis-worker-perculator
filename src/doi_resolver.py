@@ -121,7 +121,6 @@ def get_response(url, s, r=0):
             url: the url to get
             s: the session to use
     """
-    # TODO replace  `export.arxiv.org`
     try:
         result = s.get(url, timeout=10)
     except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
@@ -228,6 +227,7 @@ def link_url(url):
             url: the url to get
             s: the session to use
     """
+    url.replace('arxiv.org', 'export.arxiv.org')
     logging.warning(url)
 
     # check if the url contains the doi
