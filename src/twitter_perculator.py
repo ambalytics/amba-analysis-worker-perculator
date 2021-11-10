@@ -1,5 +1,7 @@
 import json
 import logging
+import threading
+
 import doi_resolver
 from event_stream.dao import DAO
 import os
@@ -19,7 +21,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     dao = None
 
-    process_number = 1
+    process_number = 3
+    current_id = 0
 
     def on_message(self, json_msg):
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
@@ -43,7 +46,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
                 # we use the id for mongo todo
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
-                logging.warning(e.data['subj']['data']['_id'])
+                threading.Timer(20, self.alive, args=[self, e.data['subj']['data']['_id']]).start()
+                self.current_id = e.data['subj']['data']['_id']
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
                 # check for doi recognition on tweet self
@@ -134,6 +138,10 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         logging.debug(TwitterPerculator.log + 'Start %s' % str(i))
         tp.consume()
 
+    def alive(self, old_id):
+        if old_id == self.current_id:
+            logging.warning('Exit Container because of no data throughput')
+            os.system("pkill -9 python")  # allows killing of multiprocessing programs
 
 if __name__ == '__main__':
     SENTRY_DSN = os.environ.get('SENTRY_DSN')
