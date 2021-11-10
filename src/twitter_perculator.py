@@ -42,6 +42,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
                 # we use the id for mongo todo
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
+                logging.warning(e.data['subj']['data']['_id'])
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
                 # check for doi recognition on tweet self
