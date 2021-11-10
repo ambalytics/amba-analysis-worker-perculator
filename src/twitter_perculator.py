@@ -34,6 +34,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         e.from_json(json_msg)
         e.data['obj']['data'] = {}
 
+        logging.warning(e.get('source_id'))
         if e.get('source_id') == 'twitter':
             # logging.warning(self.log + "on message twitter perculator")
 
