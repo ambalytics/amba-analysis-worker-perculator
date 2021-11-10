@@ -227,7 +227,7 @@ def link_url(url):
             url: the url to get
             s: the session to use
     """
-    url.replace('arxiv.org', 'export.arxiv.org')
+    url = url.replace('arxiv.org', 'export.arxiv.org')
     logging.warning(url)
 
     # check if the url contains the doi
