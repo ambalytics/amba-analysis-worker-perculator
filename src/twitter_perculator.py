@@ -19,7 +19,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
     dao = None
 
-    process_number = 3
+    process_number = 1
 
     def on_message(self, json_msg):
         """either link a event to a publication or add doi to it and mark it unknown to add the publication finder topic
