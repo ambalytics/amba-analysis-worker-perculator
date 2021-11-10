@@ -121,6 +121,7 @@ def get_response(url, s, r=0):
             url: the url to get
             s: the session to use
     """
+    # TODO replace  `export.arxiv.org`
     try:
         result = s.get(url, timeout=10)
     except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
@@ -208,10 +209,10 @@ def url_doi_check(data):
                 if doi_data is False and 'unwound_url' in url:
                     doi_data = link_url(url['unwound_url'])
                 if doi_data is not False:
-                    logging.debug(doi_data)
+                    logging.warning(doi_data)
                     return doi_data
             if doi_data is not False:
-                logging.debug(doi_data)
+                logging.warning(doi_data)
                 return doi_data
     return doi_data
 
@@ -265,6 +266,7 @@ def link_url(url):
             logging.debug('fulltext')
             return doi
 
+    logging.warning('fail')
     return False
 
 
