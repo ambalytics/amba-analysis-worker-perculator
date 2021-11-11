@@ -48,6 +48,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
                 threading.Timer(60, self.alive, args=[e.data['subj']['data']['_id']]).start()
                 self.current_id = e.data['subj']['data']['_id']
+                logging.warning(self.current_id)
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
                 # check for doi recognition on tweet self
@@ -139,6 +140,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         tp.consume()
 
     def alive(self, old_id):
+        logging.warning(self.current_id)
         if old_id == self.current_id:
             logging.warning('Exit Container because of no data throughput')
             os.system("pkill -9 python")  # allows killing of multiprocessing programs
