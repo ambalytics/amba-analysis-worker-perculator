@@ -946,7 +946,7 @@ this function is cached up to 100 elements</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;arxiv.org&#39;</span><span class="p">,</span> <span class="s1">&#39;export.arxiv.org&#39;</span><span class="p">)</span> <span class="c1"># arxiv wants this url to be used by machines</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">ConnectionRefusedError</span><span class="p">,</span> <span class="n">SSLError</span><span class="p">,</span> <span class="n">ReadTimeoutError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TooManyRedirects</span><span class="p">,</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span><span class="p">,</span> <span class="n">NewConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">SSLError</span><span class="p">,</span> <span class="ne">ConnectionError</span><span class="p">):</span>
@@ -954,8 +954,7 @@ this function is cached up to 100 elements</p>
         <span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
         <span class="c1"># get the response for the provided url</span>
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Pragma&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span>
+            <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.104 Safari/537.36&#39;</span>
         <span class="p">}</span>
         <span class="n">s</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
@@ -1009,7 +1008,7 @@ this function is cached up to 10000 elements</p>
 <span class="sd">            url: the url to get</span>
 <span class="sd">            s: the session to use</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="c1"># logging.warning(url)</span>
 
     <span class="c1"># check if the url contains the doi</span>
     <span class="n">doi</span> <span class="o">=</span> <span class="n">check_doi_list_valid</span><span class="p">(</span><span class="n">get_potential_dois_from_text</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
@@ -1020,8 +1019,7 @@ this function is cached up to 10000 elements</p>
     <span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
     <span class="c1"># get the response for the provided url</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Pragma&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span>
+        <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.104 Safari/537.36&#39;</span>
     <span class="p">}</span>
     <span class="n">s</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">get_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
