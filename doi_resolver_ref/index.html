@@ -945,6 +945,7 @@ this function is cached up to 100 elements</p>
 <span class="sd">            s: the session to use</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;arxiv.org&#39;</span><span class="p">,</span> <span class="s1">&#39;export.arxiv.org&#39;</span><span class="p">)</span> <span class="c1"># arxiv wants this url to be used by machines</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">ConnectionRefusedError</span><span class="p">,</span> <span class="n">SSLError</span><span class="p">,</span> <span class="n">ReadTimeoutError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TooManyRedirects</span><span class="p">,</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
@@ -1008,7 +1009,6 @@ this function is cached up to 10000 elements</p>
 <span class="sd">            url: the url to get</span>
 <span class="sd">            s: the session to use</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;arxiv.org&#39;</span><span class="p">,</span> <span class="s1">&#39;export.arxiv.org&#39;</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
     <span class="c1"># check if the url contains the doi</span>
