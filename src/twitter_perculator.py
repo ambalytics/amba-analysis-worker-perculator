@@ -30,7 +30,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         Arguments:
             json_msg: json message representing a event
         """
-        logging.warning('message')
         if not self.dao:
             self.dao = DAO()
 
@@ -46,9 +45,9 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
                 # we use the id for mongo todo
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
-                threading.Timer(60, self.alive, args=[e.data['subj']['data']['_id']]).start()
+                threading.Timer(90, self.alive, args=[e.data['subj']['data']['_id']]).start()
                 self.current_id = e.data['subj']['data']['_id']
-                logging.warning(self.current_id)
+                logging.warning('start: ' + str(self.current_id))
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
                 # check for doi recognition on tweet self
@@ -69,10 +68,10 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                             break
 
                     if doi is False:
-                        logging.warning(self.log + " no doi")
+                        logging.warning("no doi")
                         logging.debug(e.data['subj']['data']['includes']['tweets'])
                 else:
-                    logging.warning(self.log + " no doi")
+                    logging.warning("no doi")
                     logging.debug(e.data['subj']['data'])
             else:
                 logging.warning('no id')
@@ -82,12 +81,13 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     def update_event(self, event, doi):
         """update the event either with publication or just with doi and set the state accordingly
         """
+        self.current_id = 1
+        
         event.data['obj']['data']['doi'] = doi
         publication = self.get_publication_info(doi)
 
         if publication and isinstance(publication, dict) and 'title' in publication:
             self.add_publication(event, publication)
-            logging.warning('linked')
             event.set('state', 'linked')
         else:
             self.add_publication(event, {'doi': doi})
@@ -140,7 +140,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         tp.consume()
 
     def alive(self, old_id):
-        logging.warning(self.current_id)
+        logging.warning('end: ' + str(self.current_id))
         if old_id == self.current_id:
             logging.warning('Exit Container because of no data throughput')
             os.system("pkill -9 python")  # allows killing of multiprocessing programs
