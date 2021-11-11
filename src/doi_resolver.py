@@ -112,6 +112,7 @@ def get_dois_regex(regex, temp_doi):
 #         yield start
 #         start += len(sub)
 # cache in case of duplicates
+
 @lru_cache(maxsize=100)
 def get_response(url, s, r=0):
     """get a response from a given url using a given session s, a session can be used for headers,
@@ -123,7 +124,7 @@ def get_response(url, s, r=0):
     """
     try:
         url = url.replace('arxiv.org', 'export.arxiv.org') # arxiv wants this url to be used by machines
-        result = s.get(url, timeout=10)
+        result = s.get(url, stream=False, timeout=5)
     except (ConnectionRefusedError, SSLError, ReadTimeoutError, requests.exceptions.TooManyRedirects,
             requests.exceptions.ConnectionError,
             requests.exceptions.ReadTimeout, NewConnectionError, requests.exceptions.SSLError, ConnectionError):
@@ -131,8 +132,7 @@ def get_response(url, s, r=0):
         s = Session()
         # get the response for the provided url
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-            'Pragma': 'no-cache'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.104 Safari/537.36'
         }
         s.headers.update(headers)
         if r < 3:
@@ -228,7 +228,7 @@ def link_url(url):
             url: the url to get
             s: the session to use
     """
-    logging.warning(url)
+    # logging.warning(url)
 
     # check if the url contains the doi
     doi = check_doi_list_valid(get_potential_dois_from_text(url))
@@ -239,8 +239,7 @@ def link_url(url):
     s = Session()
     # get the response for the provided url
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-        'Pragma': 'no-cache'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.104 Safari/537.36'
     }
     s.headers.update(headers)
     r = get_response(url, s)
