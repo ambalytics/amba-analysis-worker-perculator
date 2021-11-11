@@ -47,11 +47,12 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
                 threading.Timer(90, self.alive, args=[e.data['subj']['data']['_id']]).start()
                 self.current_id = e.data['subj']['data']['_id']
-                logging.warning('start: ' + str(self.current_id))
+                # logging.warning('start: ' + str(self.current_id))
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
                 # check for doi recognition on tweet self
                 doi = doi_resolver.url_doi_check(e.data['subj']['data'])
+                
                 if doi is not False:
                     self.update_event(e, doi)
                 # check if we have the conversation_id in our db
@@ -62,6 +63,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                     for tweet in e.data['subj']['data']['includes']['tweets']:
                         doi = doi_resolver.url_doi_check(tweet)
                         # logging.warning('doi 2 ' + str(doi))
+                        
                         if doi is not False:
                             # use first doi we get
                             self.update_event(e, doi)
@@ -136,15 +138,16 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         """start the consumer
         """
         tp = TwitterPerculator(i)
-        logging.debug(TwitterPerculator.log + 'Start %s' % str(i))
+        logging.warning(TwitterPerculator.log + 'Start %s' % str(i))
         tp.consume()
 
     def alive(self, old_id):
-        logging.warning('end: ' + str(self.current_id))
+        # logging.warning('end: ' + str(self.current_id))
         if old_id == self.current_id:
             logging.warning('Exit Container because of no data throughput')
             os.system("pkill -9 python")  # allows killing of multiprocessing programs
 
+            
 if __name__ == '__main__':
     SENTRY_DSN = os.environ.get('SENTRY_DSN')
     SENTRY_TRACE_SAMPLE_RATE = os.environ.get('SENTRY_TRACE_SAMPLE_RATE')
