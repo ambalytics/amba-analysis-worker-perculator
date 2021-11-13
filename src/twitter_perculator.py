@@ -45,7 +45,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
 
                 # we use the id for mongo todo
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
-                threading.Timer(90, self.alive, args=[e.data['subj']['data']['_id']]).start()
+                threading.Timer(120, self.alive, args=[e.data['subj']['data']['_id']]).start()
                 self.current_id = e.data['subj']['data']['_id']
                 # logging.warning('start: ' + str(self.current_id))
                 # move matching rules to tweet self
