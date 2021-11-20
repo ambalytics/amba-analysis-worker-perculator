@@ -266,18 +266,3 @@ def link_url(url):
             return doi
 
     return False
-
-
-if __name__ == '__main__':
-    # todo make it an actual test
-    urls = [
-        "https://jamanetwork.com/journals/jamainternalmedicine/article-abstract/623118",
-    ]
-    logging.debug("start")
-    start = time.time()
-    r = set([])
-    for url in urls:
-        r.add(link_url(url))
-        logging.debug(link_url(url))
-    # logging.debug(sorted(r))
-    logging.debug("total link: " + str(time.time() - start))
