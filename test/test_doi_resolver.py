@@ -18,9 +18,9 @@ class TestDoiResolver(unittest.TestCase):
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), {None, '10.1101/2021.05.14.444134v1', '10.1101/2021.05.14.444134'})
         text = "https://arxiv.org/abs/2103.11251"
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), set())
-        text = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter" \
-               "https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD013263.pub2/full" \
-               "https://www.nejm.org/doi/full/10.1056/NEJMcibr2034927"
+        text = """https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter
+               https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD013263.pub2/full
+               https://www.nejm.org/doi/full/10.1056/NEJMcibr2034927"""
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), 'aaa')
 
     def test_link_url(self):
@@ -49,7 +49,7 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://www.tandfonline.com/doi/full/10.1080/09638237.2021.1898552"
         self.assertEqual(doi_resolver.link_url(url), '10.1080/09638237.2021.1898552')
         url = "https://www.mdpi.com/2072-4292/13/10/1955"
-        self.assertEqual(doi_resolver.link_url(url), '2072-4292/13/10/1955')
+        self.assertEqual(doi_resolver.link_url(url), '10.3390/rs13101955')
         url = "https://iopscience.iop.org/article/10.1088/1361-6528/abfee9/meta"
         self.assertEqual(doi_resolver.link_url(url), '10.1088/1361-6528/abfee9')
         url = "https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD013263.pub2/full"
