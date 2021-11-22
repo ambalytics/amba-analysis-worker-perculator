@@ -705,8 +705,6 @@
 <span class="sd">            temp_doi: the doi to use</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">temp_doi</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># logging.debug(regex.search(temp_doi).group())</span>
-        <span class="c1"># logging.debug(regex.findall(temp_doi))</span>
         <span class="k">return</span> <span class="n">regex</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">temp_doi</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div>
         </details>
@@ -894,8 +892,6 @@ the result is a set and will likely contain unvalid dois</p>
 
     <span class="k">if</span> <span class="n">doi_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">temp_doi</span> <span class="o">=</span> <span class="n">doi_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
-        <span class="c1"># logging.debug(doi_re.findall(ur))</span>
-        <span class="c1"># logging.debug(temp_doi)</span>
         <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">temp_doi</span><span class="p">)</span>
         <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_dois_regex</span><span class="p">(</span><span class="n">last_slash</span><span class="p">,</span> <span class="n">temp_doi</span><span class="p">))</span>
         <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_dois_regex</span><span class="p">(</span><span class="n">first_slash</span><span class="p">,</span> <span class="n">temp_doi</span><span class="p">))</span>
