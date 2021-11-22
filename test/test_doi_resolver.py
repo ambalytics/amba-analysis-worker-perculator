@@ -6,7 +6,7 @@ class TestDoiResolver(unittest.TestCase):
 
     def test_check_doi_list_valid(self):
         self.assertEqual(doi_resolver.check_doi_list_valid(['10.21105', '10.21105/joss.01556']), '10.21105/joss.01556')
-        self.assertEqual(doi_resolver.check_doi_list_valid(['10.21105', 'joss.01556']), False)
+        self.assertEqual(doi_resolver.check_doi_list_valid(['10.21105/joss.01556/123/123', 'joss.01556']), False)
 
     def test_crossref_url_search(self):
         self.assertEqual(doi_resolver.crossref_url_search('https://www.bmj.com/content/375/bmj.n2635'),
@@ -15,7 +15,7 @@ class TestDoiResolver(unittest.TestCase):
 
     def test_get_potential_dois_from_text(self):
         text = "https://www.biorxiv.org/content/10.1101/2021.05.14.444134v1"
-        self.assertEqual(doi_resolver.get_potential_dois_from_text(text), 'aaa')
+        self.assertEqual(doi_resolver.get_potential_dois_from_text(text), '10.1101/2021.05.14.444134')
         text = "https://arxiv.org/abs/2103.11251"
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), 'aaa')
         text = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter" \
@@ -31,7 +31,7 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://www.emerald.com/insight/content/doi/10.1108/INTR-01-2020-0038/full/html"
         self.assertEqual(doi_resolver.link_url(url), '10.1108/INTR-01-2020-0038')
         url = "https://www.sciencedirect.com/science/article/pii/S1934590921001594"
-        self.assertEqual(doi_resolver.link_url(url), 'aaa')
+        self.assertEqual(doi_resolver.link_url(url), '10.1016/j.stem.2021.04.002')
         url = "https://www.degruyter.com/document/doi/10.7208/9780226733050/html"
         self.assertEqual(doi_resolver.link_url(url), '10.7208/9780226733050')
         url = "https://link.springer.com/article/10.1007/s00467-021-05115-7"
