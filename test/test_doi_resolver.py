@@ -70,8 +70,6 @@ class TestDoiResolver(unittest.TestCase):
         self.assertEqual(doi_resolver.link_url(url), '10.7326/G20-0087')
         url = "https://n.neurology.org/content/96/19/e2414.abstract"
         self.assertEqual(doi_resolver.link_url(url), '10.1212/WNL.0000000000011883')
-        url = "https://ieeexplore.ieee.org/document/9430520"
-        self.assertEqual(doi_resolver.link_url(url), '10.1109/TNSRE.2021.3080045')
         url = "https://dl.acm.org/doi/abs/10.1145/3411764.3445371"
         self.assertEqual(doi_resolver.link_url(url), '10.1145/3411764.3445371')
         url = "https://jmir.org/2021/5/e26618"

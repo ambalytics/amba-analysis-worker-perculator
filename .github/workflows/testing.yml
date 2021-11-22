@@ -1,4 +1,4 @@
-name: Main Branch - Packaging
+name: Testing
 
 on:
   push:
