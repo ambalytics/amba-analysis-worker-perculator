@@ -81,7 +81,7 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://arxiv.org/abs/2111.06913"
         self.assertEqual(doi_resolver.link_url(url), '10.1007/978-3-030-82681-9')
         url = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter"
-        self.assertEqual(doi_resolver.link_url(url), '10.1093/glycob/cwab035/6274761')
+        self.assertEqual(doi_resolver.link_url(url), '10.1093/glycob/cwab035')
         url = "https://www.jmcc-online.com/article/S0022-2828(21)00101-2/fulltext"
         self.assertEqual(doi_resolver.link_url(url), '10.1016/j.yjmcc.2021.05.007')
 
