@@ -77,8 +77,6 @@ def get_potential_dois_from_text(text):
 
     if doi_re.search(text) is not None:
         temp_doi = doi_re.search(text).group()
-        # logging.debug(doi_re.findall(ur))
-        # logging.debug(temp_doi)
         result.add(temp_doi)
         result.add(get_dois_regex(last_slash, temp_doi))
         result.add(get_dois_regex(first_slash, temp_doi))
@@ -99,19 +97,8 @@ def get_dois_regex(regex, temp_doi):
             temp_doi: the doi to use
     """
     if regex.search(temp_doi) is not None:
-        # logging.debug(regex.search(temp_doi).group())
-        # logging.debug(regex.findall(temp_doi))
         return regex.findall(temp_doi)[0]
 
-
-# def find_all(a_str, sub):
-#     start = 0
-#     while True:
-#         start = a_str.find(sub, start)
-#         if start == -1: return
-#         yield start
-#         start += len(sub)
-# cache in case of duplicates
 
 @lru_cache(maxsize=100)
 def get_response(url, s, r=0):
