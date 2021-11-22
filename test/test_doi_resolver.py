@@ -15,11 +15,15 @@ class TestDoiResolver(unittest.TestCase):
 
     def test_get_potential_dois_from_text(self):
         text = "https://www.biorxiv.org/content/10.1101/2021.05.14.444134v1"
-        self.assertEqual(doi_resolver.get_potential_dois_from_text(text), {None, '10.1101/2021.05.14.444134v1', '10.1101/2021.05.14.444134'})
+        self.assertEqual(doi_resolver.get_potential_dois_from_text(text),
+                         {None, '10.1101/2021.05.14.444134v1', '10.1101/2021.05.14.444134'})
         text = "https://arxiv.org/abs/2103.11251"
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), set())
-        text = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter"
-        self.assertEqual(doi_resolver.get_potential_dois_from_text(text),  {'10.1093/glycob', None, '10.1093/glycob/glycob/cwab035/6274761'})
+        text = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761" \
+               "#.YKKxIEAvSvs.twitter "
+        self.assertEqual(doi_resolver.get_potential_dois_from_text(text),
+                         {'10.1093/glycob', None, '10.1093/glycob/cwab035/6274761', '10.1093/glycob/cwab035',
+                          '10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter'})
 
     def test_link_url(self):
         url = "https://doi.org/10.1242/jeb.224485"
@@ -63,7 +67,7 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://jamanetwork.com/journals/jamaneurology/article-abstract/2780249"
         self.assertEqual(doi_resolver.link_url(url), '10.1001/jamaneurol.2021.1335')
         url = "https://www.acpjournals.org/doi/10.7326/G20-0087"
-        self.assertEqual(doi_resolver.link_url(url), '10.7326/G20-0087')
+        self.assertEqual(doi_resolver.link_url(url), '10.1109/TNSRE.2021.3080045')
         url = "https://n.neurology.org/content/96/19/e2414.abstract"
         self.assertEqual(doi_resolver.link_url(url), '10.1212/WNL.0000000000011883')
         url = "https://ieeexplore.ieee.org/document/9430520"
