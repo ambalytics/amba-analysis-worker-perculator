@@ -67,7 +67,7 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://jamanetwork.com/journals/jamaneurology/article-abstract/2780249"
         self.assertEqual(doi_resolver.link_url(url), '10.1001/jamaneurol.2021.1335')
         url = "https://www.acpjournals.org/doi/10.7326/G20-0087"
-        self.assertEqual(doi_resolver.link_url(url), '10.1109/TNSRE.2021.3080045')
+        self.assertEqual(doi_resolver.link_url(url), '10.7326/G20-0087')
         url = "https://n.neurology.org/content/96/19/e2414.abstract"
         self.assertEqual(doi_resolver.link_url(url), '10.1212/WNL.0000000000011883')
         url = "https://ieeexplore.ieee.org/document/9430520"
