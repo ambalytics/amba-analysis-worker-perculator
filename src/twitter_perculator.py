@@ -43,7 +43,6 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
             if 'id' in e.data['subj']['data']:
                 # logging.warning(self.log + e.data['subj']['data']['id'])
 
-                # we use the id for mongo todo
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
                 threading.Timer(120, self.alive, args=[e.data['subj']['data']['_id']]).start()
                 self.current_id = e.data['subj']['data']['_id']
@@ -107,7 +106,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         """
         logging.debug(self.log + "linked publication")
         event.data['obj']['data'] = publication
-        doi_base_url = "https://doi.org/"  # todo
+        doi_base_url = "https://doi.org/"
         event.data['obj']['pid'] = doi_base_url + publication['doi']
         event.data['obj']['alternative-id'] = publication['doi']
         event.set('obj_id', event.data['obj']['pid'])
