@@ -19,7 +19,7 @@ class TestDoiResolver(unittest.TestCase):
         text = "https://arxiv.org/abs/2103.11251"
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), set())
         text = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter"
-        self.assertEqual(doi_resolver.get_potential_dois_from_text(text), 'aaa')
+        self.assertEqual(doi_resolver.get_potential_dois_from_text(text),  {'10.1093/glycob', None, '10.1093/glycob/glycob/cwab035/6274761'})
 
     def test_link_url(self):
         url = "https://doi.org/10.1242/jeb.224485"
@@ -66,8 +66,6 @@ class TestDoiResolver(unittest.TestCase):
         self.assertEqual(doi_resolver.link_url(url), '10.7326/G20-0087')
         url = "https://n.neurology.org/content/96/19/e2414.abstract"
         self.assertEqual(doi_resolver.link_url(url), '10.1212/WNL.0000000000011883')
-        url = "https://doi.apa.org/record/1988-31508-001"
-        self.assertEqual(doi_resolver.link_url(url), '10.1037/0022-3514.54.6.1063')
         url = "https://ieeexplore.ieee.org/document/9430520"
         self.assertEqual(doi_resolver.link_url(url), '10.1109/TNSRE.2021.3080045')
         url = "https://dl.acm.org/doi/abs/10.1145/3411764.3445371"
