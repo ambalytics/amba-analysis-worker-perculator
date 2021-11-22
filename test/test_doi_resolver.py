@@ -18,9 +18,7 @@ class TestDoiResolver(unittest.TestCase):
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), {None, '10.1101/2021.05.14.444134v1', '10.1101/2021.05.14.444134'})
         text = "https://arxiv.org/abs/2103.11251"
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), set())
-        text = """https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter
-               https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD013263.pub2/full
-               https://www.nejm.org/doi/full/10.1056/NEJMcibr2034927"""
+        text = "https://academic.oup.com/glycob/advance-article-abstract/doi/10.1093/glycob/cwab035/6274761#.YKKxIEAvSvs.twitter"
         self.assertEqual(doi_resolver.get_potential_dois_from_text(text), 'aaa')
 
     def test_link_url(self):
@@ -53,7 +51,7 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://iopscience.iop.org/article/10.1088/1361-6528/abfee9/meta"
         self.assertEqual(doi_resolver.link_url(url), '10.1088/1361-6528/abfee9')
         url = "https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD013263.pub2/full"
-        self.assertEqual(doi_resolver.link_url(url), '10.1002/14651858.CD013263')
+        self.assertEqual(doi_resolver.link_url(url), '10.1002/14651858.CD013263.pub2')
         url = "https://www.nejm.org/doi/full/10.1056/NEJMcibr2034927"
         self.assertEqual(doi_resolver.link_url(url), '10.1056/NEJMcibr2034927')
         url = "https://www.thelancet.com/journals/eclinm/article/PIIS2589-5370(20)30464-8/fulltext"
