@@ -38,15 +38,12 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         e.data['obj']['data'] = {}
 
         if e.get('source_id') == 'twitter':
-            # logging.warning(self.log + "on message twitter perculator")
 
             if 'id' in e.data['subj']['data']:
-                # logging.warning(self.log + e.data['subj']['data']['id'])
-
                 e.data['subj']['data']['_id'] = e.data['subj']['data'].pop('id')
                 threading.Timer(120, self.alive, args=[e.data['subj']['data']['_id']]).start()
                 self.current_id = e.data['subj']['data']['_id']
-                # logging.warning('start: ' + str(self.current_id))
+
                 # move matching rules to tweet self
                 e.data['subj']['data']['matching_rules'] = e.data['subj']['data']['matching_rules']
                 # check for doi recognition on tweet self
@@ -58,10 +55,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
                 # where discussionData.subjId == conversation_id
                 # check the includes object for the original tweet url
                 elif 'tweets' in e.data['subj']['data']['includes']:
-                    # logging.warning('tweets')
                     for tweet in e.data['subj']['data']['includes']['tweets']:
                         doi = doi_resolver.url_doi_check(tweet)
-                        # logging.warning('doi 2 ' + str(doi))
                         
                         if doi is not False:
                             # use first doi we get
@@ -141,7 +136,7 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
         tp.consume()
 
     def alive(self, old_id):
-        # logging.warning('end: ' + str(self.current_id))
+        """ check if the id of the element that is worked on changed, if not kill the container since something is wrong """
         if old_id == self.current_id:
             logging.warning('Exit Container because of no data throughput')
             os.system("pkill -9 python")  # allows killing of multiprocessing programs
