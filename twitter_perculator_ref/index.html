@@ -312,6 +312,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#twitter_perculator.TwitterPerculator.alive" class="md-nav__link">
+    alive()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#twitter_perculator.TwitterPerculator.get_publication_info" class="md-nav__link">
     get_publication_info()
   </a>
@@ -416,6 +423,13 @@
           <li class="md-nav__item">
   <a href="#twitter_perculator.TwitterPerculator.add_publication" class="md-nav__link">
     add_publication()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#twitter_perculator.TwitterPerculator.alive" class="md-nav__link">
+    alive()
   </a>
   
 </li>
@@ -575,7 +589,7 @@ TwitterPerculator            (<span title="event_stream.event_stream_consumer.Ev
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">+</span> <span class="s2">&quot;linked publication&quot;</span><span class="p">)</span>
     <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;obj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">publication</span>
-    <span class="n">doi_base_url</span> <span class="o">=</span> <span class="s2">&quot;https://doi.org/&quot;</span>  <span class="c1"># todo</span>
+    <span class="n">doi_base_url</span> <span class="o">=</span> <span class="s2">&quot;https://doi.org/&quot;</span>
     <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;obj&#39;</span><span class="p">][</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doi_base_url</span> <span class="o">+</span> <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span>
     <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;obj&#39;</span><span class="p">][</span><span class="s1">&#39;alternative-id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">publication</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span>
     <span class="n">event</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;obj_id&#39;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;obj&#39;</span><span class="p">][</span><span class="s1">&#39;pid&#39;</span><span class="p">])</span>
@@ -585,6 +599,34 @@ TwitterPerculator            (<span title="event_stream.event_stream_consumer.Ev
 
   </div>
 
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="twitter_perculator.TwitterPerculator.alive" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">alive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>check if the id of the element that is worked on changed, if not kill the container since something is wrong </p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/twitter_perculator.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">alive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; check if the id of the element that is worked on changed, if not kill the container since something is wrong &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">old_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_id</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Exit Container because of no data throughput&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pkill -9 python&quot;</span><span class="p">)</span>  <span class="c1"># allows killing of multiprocessing programs</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 
@@ -700,16 +742,12 @@ TwitterPerculator            (<span title="event_stream.event_stream_consumer.Ev
     <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;obj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;twitter&#39;</span><span class="p">:</span>
-        <span class="c1"># logging.warning(self.log + &quot;on message twitter perculator&quot;)</span>
 
         <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]:</span>
-            <span class="c1"># logging.warning(self.log + e.data[&#39;subj&#39;][&#39;data&#39;][&#39;id&#39;])</span>
-
-            <span class="c1"># we use the id for mongo todo</span>
             <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
             <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current_id</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span>
-            <span class="c1"># logging.warning(&#39;start: &#39; + str(self.current_id))</span>
+
             <span class="c1"># move matching rules to tweet self</span>
             <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;matching_rules&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;matching_rules&#39;</span><span class="p">]</span>
             <span class="c1"># check for doi recognition on tweet self</span>
@@ -721,10 +759,8 @@ TwitterPerculator            (<span title="event_stream.event_stream_consumer.Ev
             <span class="c1"># where discussionData.subjId == conversation_id</span>
             <span class="c1"># check the includes object for the original tweet url</span>
             <span class="k">elif</span> <span class="s1">&#39;tweets&#39;</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;includes&#39;</span><span class="p">]:</span>
-                <span class="c1"># logging.warning(&#39;tweets&#39;)</span>
                 <span class="k">for</span> <span class="n">tweet</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;subj&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;includes&#39;</span><span class="p">][</span><span class="s1">&#39;tweets&#39;</span><span class="p">]:</span>
                     <span class="n">doi</span> <span class="o">=</span> <span class="n">doi_resolver</span><span class="o">.</span><span class="n">url_doi_check</span><span class="p">(</span><span class="n">tweet</span><span class="p">)</span>
-                    <span class="c1"># logging.warning(&#39;doi 2 &#39; + str(doi))</span>
 
                     <span class="k">if</span> <span class="n">doi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
                         <span class="c1"># use first doi we get</span>
