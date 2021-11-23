@@ -1,12 +1,9 @@
-import json
 import logging
 import threading
-
 import doi_resolver
 from event_stream.dao import DAO
 import os
 import sentry_sdk
-
 from event_stream.event_stream_consumer import EventStreamConsumer
 from event_stream.event_stream_producer import EventStreamProducer
 from event_stream.event import Event
