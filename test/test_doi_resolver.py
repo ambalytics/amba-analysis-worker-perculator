@@ -85,5 +85,6 @@ class TestDoiResolver(unittest.TestCase):
         url = "https://www.jmcc-online.com/article/S0022-2828(21)00101-2/fulltext"
         self.assertEqual(doi_resolver.link_url(url), '10.1016/j.yjmcc.2021.05.007')
 
-        if __name__ == '__main__':
-            unittest.main()
+
+if __name__ == '__main__':
+    unittest.main()

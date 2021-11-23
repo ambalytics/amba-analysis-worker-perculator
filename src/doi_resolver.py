@@ -24,7 +24,7 @@ def check_doi_list_valid(potential_dois):
     for doi in potential_dois:
         if doi is not None and doi:
             pdoi = pdoi + doi + ','
-    pre = "http://doi.org/doiRA/"  # todo
+    pre = "http://doi.org/doiRA/"
     rw = False
     if pdoi != '':
         r = requests.get(pre + pdoi)
