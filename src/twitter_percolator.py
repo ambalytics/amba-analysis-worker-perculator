@@ -9,12 +9,12 @@ from event_stream.event_stream_producer import EventStreamProducer
 from event_stream.event import Event
 
 
-class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
+class TwitterPercolator(EventStreamConsumer, EventStreamProducer):
     """ link events to doi and if possible add a publication to it """
     state = "unlinked"
-    group_id = "perculator"
+    group_id = "percolator"
     relation_type = "discusses"
-    log = "TwitterPerculator "
+    log = "TwitterPercolator "
 
     dao = None
 
@@ -128,8 +128,8 @@ class TwitterPerculator(EventStreamConsumer, EventStreamProducer):
     def start(i=0):
         """start the consumer
         """
-        tp = TwitterPerculator(i)
-        logging.warning(TwitterPerculator.log + 'Start %s' % str(i))
+        tp = TwitterPercolator(i)
+        logging.warning(TwitterPercolator.log + 'Start %s' % str(i))
         tp.consume()
 
     def alive(self, old_id):
@@ -147,4 +147,4 @@ if __name__ == '__main__':
         traces_sample_rate=SENTRY_TRACE_SAMPLE_RATE
     )
 
-    TwitterPerculator.start(1)
+    TwitterPercolator.start(1)
