@@ -1,4 +1,4 @@
-# amba-analysis-worker-perculator
+# amba-analysis-worker-percolator
 
 The percolator component connects a discussion event, i.e., a tweet, to a publication or at least a DOI. Without the connection, the event can not be further processed by the analytical components. The percolator is based on ideas developed by CrossRef, that use a percolator for linking events as well. The percolator is developed in python using the amba-event-stream package. It runs as a docker container.
 
@@ -8,7 +8,7 @@ One way of linking data is using Meta Tags, these are HTML tags embedded in the 
 
 Multiple methods of extraction are used to find the DOI for given discussion events. An overview of the process can be seen in Figure 1. First, the tweet data is checked for URLs. If that fails or these URLs do not contain a DOI, additionally, all referenced tweets will be checked. A response may not contain an URL itself but reference the original tweet the response is responding to. Thus, the URL needs to be linked. Note that multiple URLs are available from the Twitter API, that differentiate in their characteristics: a short URL, an expanded URL as well as an unwound URL. Since the DOI ideally can be extracted from the URL itself, the expanded and unwound URL are both checked. Sometimes only the expanded URL contains the DOI, while otherwhile the unwound URL does.
 
-![perculator_linking_new](https://user-images.githubusercontent.com/84507772/142740760-72bd7108-bb89-4d5d-9bf6-d756e8603673.png)
+![percolator_linking_new](https://user-images.githubusercontent.com/84507772/142740760-72bd7108-bb89-4d5d-9bf6-d756e8603673.png)
 Processing Schema of Linking a Tweet with a Publication DOI
 
 The function of linking an URL with a DOI is cached up to 10000 URLs by a Least recently used (LRU) cache. Caching this function allows for very little storage needed to cache since function parameter and result are both small. The cache generally allows faster processing and less need for requests in general. The LRU caching strategy ensures the most used are staying in the cache. The data is static and likely to not change ensuring time is not relevant for cache to expire.

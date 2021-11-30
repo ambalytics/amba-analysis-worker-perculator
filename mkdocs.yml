@@ -1,13 +1,13 @@
-site_name: Amba Analysis Worker Perculator
-site_description: 'documentation for amba-analysis-worker-perculator'
+site_name: Amba Analysis Worker Percolator
+site_description: 'documentation for amba-analysis-worker-percolator'
 site_author: 'Lukas Jesche'
 docs_dir: docs/
-repo_name: 'ambalytics/amba-analysis-worker-perculator'
-repo_url: 'https://github.com/ambalytics/amba-analysis-worker-perculator'
+repo_name: 'ambalytics/amba-analysis-worker-percolator'
+repo_url: 'https://github.com/ambalytics/amba-analysis-worker-percolator'
 nav:
     - Home: index.md
     - Code Reference:
-        twitter perculator: twitter_perculator_ref.md
+        twitter percolator: twitter_percolator_ref.md
         doi resolver: doi_resolver_ref.md
 
 theme:

@@ -42,7 +42,7 @@ def crossref_url_search(url):
         Arguments:
             url: the url to get a doi for
     """
-    r = requests.get("https://api.eventdata.crossref.org/v1/events?rows=1&obj.url=" + url)
+    r = requests.get("http://api.eventdata.crossref.org/v1/events?rows=1&obj.url=" + url)
     if r.status_code == 200:
         json_response = r.json()
         if 'status' in json_response:
